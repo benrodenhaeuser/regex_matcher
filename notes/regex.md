@@ -1,6 +1,6 @@
 # regex
 
-## grammar
+## Grammar
 
 ### Constructs
 
@@ -25,3 +25,10 @@ v     alternation
 - a term is a (possibly empty) sequence of factors
 - a factor is a base possibly followed by a star
 - a base is a character, an escaped character, or a parenthesized regex
+
+
+## Types of matches
+
+- per line
+- global
+- ...

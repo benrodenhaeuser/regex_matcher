@@ -168,8 +168,16 @@ module Matcher
       @accept = accept
     end
 
+    def dfa?
+      # TODO
+    end
+
     def self.from_regex(ast)
-      # TODO 
+      # TODO
+    end
+
+    def accept?(string)
+      # TODO
     end
 
     def self.from_char(char)
@@ -193,10 +201,6 @@ module Matcher
       Set[*chars.reject { |char| char == '' }]
     end
 
-    def accept?(string)
-      # TODO
-    end
-
     def label_all_states
       index = 0
 
@@ -208,7 +212,7 @@ module Matcher
 
     def to_s
       label_all_states
-      state_space.map { |state| "#{state.transition_list}" }.join("\n")
+      state_space.map { |state| state.transition_list }.join("\n")
     end
   end
 end
