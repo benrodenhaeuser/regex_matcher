@@ -1,131 +1,214 @@
-# a state has a moves attribute: the keys are characters.
-# for each key, the value is a list of states.
-module Automaton
+require 'set'
+
+class Set
+  def singleton?
+    size == 1
+  end
+
+  def unique_member
+    raise 'Not a singleton!' if size != 1
+    to_a.first
+  end
+
+  def to_s
+    '{' + to_a.map(&:to_s).join(', ') + '}'
+  end
+end
+
+module Matcher
+  SILENT = ''
+
   class State
     attr_reader :moves
-    attr_accessor :label
+    attr_accessor :label, :data
 
-    def initialize
-      @moves = {}
+    def initialize(label: nil, data: nil)
+      @moves = Hash.new { |hash, key| hash[key] = Set.new }
+      @label = label
+      @data = data
     end
 
-    # accessible in one step
+    def to_s
+      label
+    end
+
+    def transition_list
+      if neighbors.empty?
+        label
+      else
+        moves.map do |char, accessible_states|
+          char = (char == '' ? "\u03B5".encode('utf-8') : char)
+          accessible_states.map do |state|
+            "#{label} --#{char}--> #{state.label}"
+          end
+        end.join("\n")
+      end
+    end
+
+    def chars
+      moves.keys.reject { |key| key == SILENT }
+    end
+
     def neighbors
-      moves.reduce([]) do |list, (_, states)|
-        states.each do |state|
-          list << state unless list.include?(state)
+      moves.each_with_object(Set.new) do |(_, set_of_states), collection|
+        set_of_states.each do |state|
+          collection.add(state) unless collection.include?(state)
         end
-        list
       end
     end
 
-    # accessible in >= 0 steps
-    def reachable(list = [self])
+    def reachable(collection = Set[self])
       neighbors.each do |neighbor|
-        next if list.include?(neighbor)
-        list << neighbor
-        neighbor.reachable(list)
+        next if collection.include?(neighbor)
+        collection.add(neighbor)
+        neighbor.reachable(collection)
       end
 
-      list
+      collection
+    end
+
+    def epsilon_closure(collection = Set[self])
+      neighbors.each do |neighbor|
+        next if collection.include?(neighbor)
+        collection.add(neighbor) if moves[SILENT].include?(neighbor)
+        neighbor.epsilon_closure(collection)
+      end
+
+      collection
     end
   end
 
-  # the operations needed for the Thompson construction
   module Thompson
-    SILENT = ''
-
     def alternate(other)
       new_start = State.new
       new_accept_state = State.new
-      new_start.moves[SILENT] = [start, other.start]
-      accept_list.first.moves[SILENT] = [new_accept_state]
-      other.accept_list.first.moves[SILENT] = [new_accept_state]
+      new_start.moves[SILENT] = Set[start, other.start]
+      accept.unique_member.moves[SILENT] = Set[new_accept_state]
+      other.accept.unique_member.moves[SILENT] = Set[new_accept_state]
       self.start = new_start
-      self.accept_list = [new_accept_state]
+      self.accept = Set[new_accept_state]
       self
     end
 
-    def compose(other)
-      accept_list.first.moves[SILENT] = [other.start]
-      self.accept_list = other.accept_list
+    def concatenate(other)
+      accept.unique_member.moves[SILENT] = Set[other.start]
+      self.accept = other.accept
       self
     end
 
     def iterate
       new_start = State.new
       new_accept_state = State.new
-      accept_list.first.moves[SILENT] = [start, new_accept_state]
-      new_start.moves[SILENT] = [start, new_accept_state]
+      accept.unique_member.moves[SILENT] = Set[start, new_accept_state]
+      new_start.moves[SILENT] = Set[start, new_accept_state]
       self.start = new_start
-      self.accept_list = [new_accept_state]
+      self.accept = Set[new_accept_state]
       self
     end
   end
 
-  # an automaton has a unique start state
-  # and a list of accepting states
-  class NFA
+  module Subset
+    def to_dfa
+      dfa_start = State.new(data: epsilon_closure(Set[self.start]))
+      dfa_accept = Set.new
+
+      dfa_states = Set[dfa_start]
+      stack = [dfa_start]
+
+      while !stack.empty?
+        q = stack.pop
+
+        if q.data.any? { |old_state| accept.include?(old_state) }
+          dfa_accept.add(q)
+        end
+
+        alphabet.each do |char|
+          data = epsilon_closure(neighbors(q.data, char))
+          t = find_state(dfa_states, data) || State.new(data: data)
+          q.moves[char] = Set[t] # singleton!
+          if !find_state(dfa_states, data)
+            dfa_states.add(t)
+            stack.push(t)
+          end
+        end
+      end
+
+      Automaton.new(start: dfa_start, accept: dfa_accept)
+    end
+
+    def epsilon_closure(states)
+      the_epsilon_closure = Set.new
+      states.each do |state|
+        the_epsilon_closure.merge(state.epsilon_closure)
+      end
+      the_epsilon_closure
+    end
+
+    def neighbors(states, char)
+      the_neighbors = Set.new
+      states.each do |state|
+        the_neighbors.merge(state.moves[char])
+      end
+      the_neighbors
+    end
+
+    def find_state(dfa_states, data)
+      dfa_states.find { |state| state.data == data }
+    end
+  end
+
+  class Automaton
     include Thompson
+    include Subset
 
-    attr_accessor :start, :accept_list
+    attr_accessor :start, :accept
 
-    def initialize(start_state, accept_list)
-      @start = start_state
-      @accept_list = accept_list
+    def initialize(start: nil, accept: nil)
+      @start = start
+      @accept = accept
+    end
+
+    def self.from_regex(ast)
+      # TODO 
     end
 
     def self.from_char(char)
       start = State.new
       accept_state = State.new
-      start.moves[char] = [accept_state]
-      new(start, [accept_state])
+      start.moves[char] = Set[accept_state]
+      new(start: start, accept: Set[accept_state])
     end
 
-    def accept?(string)
-      # move through the automaton.
-      # this is easier in a deterministic automaton
-      # so we could use that.
-    end
-
-    def states
+    def state_space
       @start.reachable
     end
 
-    def label_states
-      states.each_with_index do |state, index|
+    def alphabet
+      chars = Set.new
+
+      state_space.each do |state|
+        chars.merge(Set[*state.moves.keys])
+      end
+
+      Set[*chars.reject { |char| char == '' }]
+    end
+
+    def accept?(string)
+      # TODO
+    end
+
+    def label_all_states
+      index = 0
+
+      state_space.each do |state|
         state.label = "q#{index}"
+        index += 1
       end
     end
 
-    def to_dfa
-      # make the automaton deterministic
-      # "subset construction"
-    end
-
-    # print a transition table
     def to_s
-      label_states
-      transitions =
-        states.map do |state|
-          if !state.moves.empty?
-            state.moves.map do |key, value|
-              char = (key == '' ? "\u03B5".encode('utf-8') : key)
-              "#{state.label}--#{char}-->#{value.map { |elem| elem.label }}"
-            end
-          else
-            "#{state.label}"
-          end
-        end.join("\n")
-
-      "start: #{start.label} \n" +
-      "accepting: #{accept_list.map(&:label)} \n" +
-      transitions
+      label_all_states
+      state_space.map { |state| "#{state.transition_list}" }.join("\n")
     end
   end
 end
-
-# TESTS
-
-# automaton for (c|d)*
-puts Automaton::NFA.from_char('c').alternate(Automaton::NFA.from_char('d')).iterate
