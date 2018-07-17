@@ -14,7 +14,7 @@ class Token
   NUMBER = 4
   LPAREN = 5
   RPAREN = 6
-  ENDOFINPUT = 7 # 'End'
+  ENDOFINPUT = 7
 
   attr_accessor :kind
   attr_accessor :value

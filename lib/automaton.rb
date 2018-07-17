@@ -15,13 +15,14 @@ class Set
   end
 end
 
-module Matcher
+module Rex
   SILENT = ''
 
   class State
     attr_reader :moves
     attr_accessor :label, :data
 
+    # todo: useage of keyword arguments?
     def initialize(label: nil, data: nil)
       @moves = Hash.new { |hash, key| hash[key] = Set.new }
       @label = label
@@ -163,6 +164,7 @@ module Matcher
 
     attr_accessor :start, :accept
 
+    # todo: useage of keyword arguments?
     def initialize(start: nil, accept: nil)
       @start = start
       @accept = accept
