@@ -17,7 +17,7 @@ v     alternation
   <regex> ::= <term> '|' <regex> | <term>
    <term> ::= { <factor> }
  <factor> ::= <base> [ '*' ]
-   <base> ::= <char> | '.' | '(' <regex> ')'
+   <base> ::= <char> | '(' <regex> ')'
    <char> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
 ```
 

@@ -8,9 +8,8 @@ module Rex
     end
   end
 
-  class Scanner
+  class Tokenizer
     EOF = -1
-
     START_TYPE = 0
     EOF_TYPE = 1
     CHAR = 2
@@ -20,11 +19,13 @@ module Rex
     LPAREN = 6
     RPAREN = 7
 
+    attr_reader :cursor
+
     def initialize(source)
       @source = source
       @position = 0
       @cursor = @source[@position]
-      @token = Token.new(START_TYPE, '')
+      @scanned_token = Token.new(START_TYPE, '')
     end
 
     def consume
@@ -40,57 +41,109 @@ module Rex
       end
     end
 
-    def character?
-      @cursor.match(/[A-Z]/i)
-    end
-
     def next_token
       while @cursor != EOF
-        case @cursor
-        when ' ', "\t", "\n", "\r" then white_space
+        consume while @cursor == ' '
 
-        when '('
-          consume
-          return @token = Token.new(LPAREN, '(')
-
-        when ')'
-          consume
-          return @token = Token.new(RPAREN, ')')
-
-        when '*'
-          consume
-          return @token = Token.new(STAR, '*')
-
-        when '|'
-          consume
-          return @token = Token.new(ALTERNATE, '|')
-
-        else
-          if character?
-            if @token.type == CHAR
-              return @token = Token.new(CONCATENATE, '')
+        @scanned_token =
+          case @cursor
+          when '('
+            consume
+            Token.new(LPAREN, '(')
+          when ')'
+            consume
+            Token.new(RPAREN, ')')
+          when '*'
+            consume
+            Token.new(STAR, '*')
+          when '|'
+            consume
+            Token.new(ALTERNATE, '|')
+          when *ALPHABET
+            if @scanned_token.type == CHAR
+              Token.new(CONCATENATE, '')
             else
               char = @cursor
               consume
-              return @token = Token.new(CHAR, char)
+              Token.new(CHAR, char)
             end
           else
             raise "Invalid character '#{@cursor}'"
           end
-        end
+
+        return @scanned_token
       end
 
       Token.new(EOF_TYPE, '<eof>')
     end
-
-    def white_space
-      consume while [' ', "\t", "\n", "\r"].include? @cursor
-    end
   end
 
   class Parser
-    def self.parse(regex_source)
-      # TODO
+    attr_reader :lookahead
+
+    def initialize(tokenizer)
+      @tokenizer = tokenizer
+      consume
+    end
+
+    def match(expected_type)
+      if lookahead.type == expected_type
+        consume
+      else
+        raise "Type mismatch. Expected #{expected_type}, saw #{lookahead.type}"
+      end
+    end
+
+    def consume
+      @lookahead = @tokenizer.next_token
+    end
+
+    def eof?
+      lookahead.type == Tokenizer::EOF_TYPE
+    end
+
+    def parse
+      regex
+      raise "Expected end of stream" unless eof?
+    end
+
+     #  regex ::= term '|' regex | term      # alternation
+     #   term ::= factor { factor }          # concatenation
+     # factor ::= base [ '*' ]               # iteration
+     #   base ::= char | '(' regex ')'
+     #   char ::= 'a' | 'b' | ...
+
+    def regex
+      term
+      if lookahead.type == Tokenizer::ALTERNATE
+        match(Tokenizer::ALTERNATE)
+        regex
+      end
+    end
+
+    def term
+      loop do
+        factor
+        break unless lookahead.type == Tokenizer::CONCATENATE
+        match(Tokenizer::CONCATENATE)
+      end
+    end
+
+    def factor
+      base
+      if lookahead.type == Tokenizer::STAR
+        match(Tokenizer::STAR)
+      end
+    end
+
+    def base
+      if lookahead.type == Tokenizer::CHAR
+        match(Tokenizer::CHAR)
+      elsif lookahead.type == Tokenizer::LPAREN
+        match(Tokenizer::LPAREN)
+        regex
+        match(Tokenizer::RPAREN)
+      end
     end
   end
 end

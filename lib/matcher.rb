@@ -10,7 +10,11 @@ require_relative './automaton.rb'
 
 module Rex
   def self.match?(regex, string)
-    Automaton.from_ast(Parser.parse(regex.source)).to_dfa.accept?(string)
+    parser = Parser.new
+    ast = parser.parse(regex.source)
+    nfa = ast.to_automaton
+    dfa = nfa.to_dfa
+    dfa.accept?(string)
   end
 
   def self.test_automaton
@@ -40,20 +44,51 @@ module Rex
     puts dfa.start
   end
 
-  def self.test_scanner
-    scanner = Rex::Scanner.new('a|b*')
-    p scanner.next_token # a
-    p scanner.next_token # |
-    p scanner.next_token # b
-    p scanner.next_token # *
-    p scanner.next_token # <eof>
+  def self.test_tokenizer
+    tokenizer = Tokenizer.new('a|b*')
+    while tokenizer.cursor != Tokenizer::EOF
+      p tokenizer.next_token
+    end
+    puts
+    tokenizer = Tokenizer.new('(a|b)*')
+    while tokenizer.cursor != Tokenizer::EOF
+      p tokenizer.next_token
+    end
+    puts
+    tokenizer = Tokenizer.new('(abc|b)*')
+    while tokenizer.cursor != Tokenizer::EOF
+      p tokenizer.next_token
+    end
+    tokenizer = Tokenizer.new('(abcd*|b)*')
+    while tokenizer.cursor != Tokenizer::EOF
+      p tokenizer.next_token
+    end
   end
 
   def self.test_parser
-
+    tokenizer = Tokenizer.new('a|b')
+    parser = Parser.new(tokenizer)
+    parser.parse
+    tokenizer = Tokenizer.new('a|b*')
+    parser = Parser.new(tokenizer)
+    parser.parse
+    tokenizer = Tokenizer.new('(a|b)*')
+    parser = Parser.new(tokenizer)
+    parser.parse
+    tokenizer = Tokenizer.new('(abcd*|b)*')
+    parser = Parser.new(tokenizer)
+    parser.parse
+    tokenizer = Tokenizer.new('( a b c d*|b )*')
+    parser = Parser.new(tokenizer)
+    parser.parse
+    tokenizer = Tokenizer.new('( a b c d*|b )*')
+    parser = Parser.new(tokenizer)
+    parser.parse
   end
 end
 
 Rex.test_automaton
 puts
-Rex.test_scanner
+Rex.test_tokenizer
+puts
+Rex.test_parser
