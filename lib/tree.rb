@@ -1,15 +1,4 @@
 module Rex
-  ALPHABET = ['a', 'b', 'c', 'd', 'e', 'f',
-                'g', 'h', 'i', 'j', 'k', 'l',
-                'm', 'n', 'o', 'p', 'q', 'r',
-                's', 't', 'u', 'v', 'w', 'x',
-                'y', 'z',
-                'A', 'B', 'C', 'D', 'E', 'F',
-                'G', 'H', 'I', 'J', 'K', 'L',
-                'M', 'N', 'O', 'P', 'Q', 'R',
-                'S', 'T', 'U', 'V', 'W', 'X',
-                'Y', 'Z']
-
   class Node
     attr_accessor :left, :right, :token, :automaton
 
@@ -26,7 +15,6 @@ module Rex
       @root = root # should be a token
     end
 
-    # the root node will contain the automaton that matches the parsed regex.
     def label(node = @root)
       return if node == nil
 

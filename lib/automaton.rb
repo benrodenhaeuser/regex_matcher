@@ -22,7 +22,6 @@ module Rex
     attr_reader :moves
     attr_accessor :label, :data
 
-    # todo: useage of keyword arguments?
     def initialize(label: nil, data: nil)
       @moves = Hash.new { |hash, key| hash[key] = Set.new }
       @label = label
@@ -79,7 +78,7 @@ module Rex
     end
   end
 
-  module Thompson
+  module ThompsonConstruction
     def alternate(other)
       new_start = State.new
       new_accept_state = State.new
@@ -108,7 +107,7 @@ module Rex
     end
   end
 
-  module Subset
+  module SubsetConstruction
     def to_dfa
       dfa_start = State.new(data: epsilon_closure(Set[self.start]))
       dfa_accept = Set.new
@@ -159,8 +158,8 @@ module Rex
   end
 
   class Automaton
-    include Thompson
-    include Subset
+    include ThompsonConstruction
+    include SubsetConstruction
 
     attr_accessor :start, :accept
 

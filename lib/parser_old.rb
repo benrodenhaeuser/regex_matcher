@@ -1,19 +1,6 @@
 module Rex
-  ALPHABET = [
-    'a', 'b', 'c', 'd', 'e', 'f',
-    'g', 'h', 'i', 'j', 'k', 'l',
-    'm', 'n', 'o', 'p', 'q', 'r',
-    's', 't', 'u', 'v', 'w', 'x',
-    'y', 'z',
-    'A', 'B', 'C', 'D', 'E', 'F',
-    'G', 'H', 'I', 'J', 'K', 'L',
-    'M', 'N', 'O', 'P', 'Q', 'R',
-    'S', 'T', 'U', 'V', 'W', 'X',
-    'Y', 'Z'
-  ]
-
   class Token
-    attr_reader :type, :text
+    attr_reader :type, :token
 
     def initialize(type, text)
       @type = type
@@ -116,9 +103,8 @@ module Rex
     end
 
     def parse
-      value = regex
+      regex
       raise "Expected end of stream" unless eof?
-      value
     end
 
      #  regex ::= term '|' regex | term      # alternation
@@ -128,47 +114,35 @@ module Rex
      #   char ::= 'a' | 'b' | ...
 
     def regex
-      left_value = term
+      term
       if lookahead.type == Tokenizer::ALTERNATE
         match(Tokenizer::ALTERNATE)
-        right_value = regex
+        regex
       end
-
-      return left_value unless right_value
-      left_value.alternate(right_value)
     end
 
     def term
-      values = []
       loop do
-        values << factor
+        factor
         break unless lookahead.type == Tokenizer::CONCATENATE
         match(Tokenizer::CONCATENATE)
       end
-
-      values.reduce { |memo, factor| memo.concatenate(factor) }
     end
 
     def factor
-      value = base
+      base
       if lookahead.type == Tokenizer::STAR
         match(Tokenizer::STAR)
-        value.iterate
-      else
-        value
       end
     end
 
     def base
       if lookahead.type == Tokenizer::ALPHANUMERIC
-        char = lookahead.text
         match(Tokenizer::ALPHANUMERIC)
-        Automaton.from_char(char)
       elsif lookahead.type == Tokenizer::LPAREN
         match(Tokenizer::LPAREN)
-        value = regex
+        regex
         match(Tokenizer::RPAREN)
-        value
       end
     end
   end

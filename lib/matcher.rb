@@ -9,7 +9,7 @@ require_relative './automaton.rb'
 # - check whether the dfa accepts the string
 
 module Rex
-  def self.match?(regex, string)
+  def self.match?(regex, string) # tentative
     parser = Parser.new
     ast = parser.parse(regex.source)
     nfa = ast.to_automaton
@@ -68,27 +68,36 @@ module Rex
   def self.test_parser
     tokenizer = Tokenizer.new('a|b')
     parser = Parser.new(tokenizer)
-    parser.parse
-    tokenizer = Tokenizer.new('a|b*')
-    parser = Parser.new(tokenizer)
-    parser.parse
-    tokenizer = Tokenizer.new('(a|b)*')
-    parser = Parser.new(tokenizer)
-    parser.parse
-    tokenizer = Tokenizer.new('(abcd*|b)*')
-    parser = Parser.new(tokenizer)
-    parser.parse
-    tokenizer = Tokenizer.new('( a b c d*|b )*')
-    parser = Parser.new(tokenizer)
-    parser.parse
-    tokenizer = Tokenizer.new('( a b c d*|b )*')
-    parser = Parser.new(tokenizer)
-    parser.parse
+    automaton = parser.parse
+    puts automaton.to_dfa
+    # ^ this one looks very odd
+
+    # tokenizer = Tokenizer.new('(c|d)*')
+    # parser = Parser.new(tokenizer)
+    # automaton = parser.parse
+    # puts automaton.to_dfa
+    # # ^ this one looks fine
+
+    # tokenizer = Tokenizer.new('a|b*')
+    # parser = Parser.new(tokenizer)
+    # parser.parse
+    # tokenizer = Tokenizer.new('(a|b)*')
+    # parser = Parser.new(tokenizer)
+    # parser.parse
+    # tokenizer = Tokenizer.new('(abcd*|b)*')
+    # parser = Parser.new(tokenizer)
+    # parser.parse
+    # tokenizer = Tokenizer.new('( a b c d*|b )*')
+    # parser = Parser.new(tokenizer)
+    # parser.parse
+    # tokenizer = Tokenizer.new('( a b c d*|b )*')
+    # parser = Parser.new(tokenizer)
+    # parser.parse
   end
 end
 
-Rex.test_automaton
-puts
-Rex.test_tokenizer
-puts
+# Rex.test_automaton
+# puts
+# Rex.test_tokenizer
+# puts
 Rex.test_parser
