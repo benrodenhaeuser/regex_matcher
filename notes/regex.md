@@ -14,11 +14,11 @@ v     alternation
 ### EBNF
 
 ```
-  <regex> ::= <term> '|' <regex> | <term>
-   <term> ::= { <factor> }
- <factor> ::= <base> [ '*' ]
-   <base> ::= <char> | '(' <regex> ')'
-   <char> ::= 'a' | 'b' | ... | 'z' | 'A' | 'B' | ... | 'Z'
+ regex ::= term '|' regex | term      // alternation
+  term ::= factor { factor }          // concatenation
+factor ::= base [ '*' ]               // iteration
+  base ::= char | '(' regex ')'
+  char ::= 'a' | 'b' | ...
 ```
 
 - a regex is a term or a regex followed by a term

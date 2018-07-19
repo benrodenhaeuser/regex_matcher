@@ -10,6 +10,10 @@ class Set
     to_a.first
   end
 
+  def nonempty?
+    !empty?
+  end
+
   def to_s
     '{' + to_a.map(&:to_s).join(', ') + '}'
   end
@@ -32,9 +36,9 @@ module Rex
       label
     end
 
-    def transition_list
+    def transition_string
       if neighbors.empty?
-        label
+        "#{label}: no transitions"
       else
         moves.map do |char, accessible_states|
           char = (char == '' ? "\u03B5".encode('utf-8') : char)
@@ -70,8 +74,10 @@ module Rex
     def epsilon_closure(collection = Set[self])
       neighbors.each do |neighbor|
         next if collection.include?(neighbor)
-        collection.add(neighbor) if moves[SILENT].include?(neighbor)
-        neighbor.epsilon_closure(collection)
+        if moves[SILENT].include?(neighbor)
+          collection.add(neighbor)
+          neighbor.epsilon_closure(collection)
+        end
       end
 
       collection
@@ -123,12 +129,15 @@ module Rex
         end
 
         alphabet.each do |char|
-          data = epsilon_closure(neighbors(q.data, char))
-          t = find_state(dfa_states, data) || State.new(data: data)
-          q.moves[char] = Set[t] # singleton!
-          if !find_state(dfa_states, data)
-            dfa_states.add(t)
-            stack.push(t)
+          the_neighbors = neighbors(q.data, char)
+          if the_neighbors.nonempty?
+            data = epsilon_closure(the_neighbors)
+            t = find_state(dfa_states, data) || State.new(data: data)
+            q.moves[char] = Set[t]
+            if !find_state(dfa_states, data)
+              dfa_states.add(t)
+              stack.push(t)
+            end
           end
         end
       end
@@ -163,18 +172,9 @@ module Rex
 
     attr_accessor :start, :accept
 
-    # todo: useage of keyword arguments?
     def initialize(start: nil, accept: nil)
       @start = start
       @accept = accept
-    end
-
-    def dfa?
-      # TODO
-    end
-
-    def self.from_regex(ast)
-      # TODO
     end
 
     def accept?(string)
@@ -213,7 +213,10 @@ module Rex
 
     def to_s
       label_all_states
-      state_space.map { |state| state.transition_list }.join("\n")
+      transitions = state_space.map do |state|
+        state.transition_string
+      end.join("\n")
+      "start: #{start}" + "\naccept: #{accept}" + "\ntransitions:\n#{transitions}"
     end
   end
 end

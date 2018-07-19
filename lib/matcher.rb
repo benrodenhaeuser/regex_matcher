@@ -69,21 +69,36 @@ module Rex
     tokenizer = Tokenizer.new('a|b')
     parser = Parser.new(tokenizer)
     automaton = parser.parse
+    # automaton.label_all_states
+    # puts automaton.start # q0
+    # puts "neighbors of start: #{automaton.start.neighbors}"
+    # automaton.epsilon_closure(Set[automaton.start]) # {q0, q1, q4} — good!
     puts automaton.to_dfa
-    # ^ this one looks very odd
 
-    # tokenizer = Tokenizer.new('(c|d)*')
+    # tokenizer = Tokenizer.new('a|b')
     # parser = Parser.new(tokenizer)
     # automaton = parser.parse
     # puts automaton.to_dfa
-    # # ^ this one looks fine
+
+    # p automaton.start #
+    # puts
+    # p automaton.accept
+    # puts automaton
+    # automaton.label_all_states
+    # puts automaton.to_dfa
+    # ^ odd
+
+    # tokenizer = Tokenizer.new('(a|b)*')
+    # parser = Parser.new(tokenizer)
+    # puts parser.parse
+    # # ^ fine
 
     # tokenizer = Tokenizer.new('a|b*')
     # parser = Parser.new(tokenizer)
-    # parser.parse
-    # tokenizer = Tokenizer.new('(a|b)*')
-    # parser = Parser.new(tokenizer)
-    # parser.parse
+    # automaton = parser.parse
+    # puts automaton.to_dfa
+    # # ^ odd
+
     # tokenizer = Tokenizer.new('(abcd*|b)*')
     # parser = Parser.new(tokenizer)
     # parser.parse

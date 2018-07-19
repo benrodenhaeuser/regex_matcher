@@ -121,12 +121,6 @@ module Rex
       value
     end
 
-     #  regex ::= term '|' regex | term      # alternation
-     #   term ::= factor { factor }          # concatenation
-     # factor ::= base [ '*' ]               # iteration
-     #   base ::= char | '(' regex ')'
-     #   char ::= 'a' | 'b' | ...
-
     def regex
       left_value = term
       if lookahead.type == Tokenizer::ALTERNATE
