@@ -79,8 +79,13 @@ module Rex
 
     # 'a|b*'
     # '(abcd*|b)*'
+    parser = Parser.new('ab')    # step 0: initialize parser with source
+    ast = parser.parse            # step 1: parse source into ast
+    nfa = ast.to_automaton        # step 2: build nfa from ast
+    dfa = nfa.to_dfa              # step 3: convert nfa to dfa
+    p dfa.accept?('ab') == true
+    p dfa.accept?('aa') == false
   end
-
 end
 
 # Rex.test_automaton

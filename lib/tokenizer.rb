@@ -39,13 +39,9 @@ module Rex
           consume
           Token.new(ALTERNATE, '|')
         when *ALPHABET
-          if @token.type == ALPHANUMERIC
-            Token.new(CONCATENATE, '')
-          else
-            char = @cursor
-            consume
-            Token.new(ALPHANUMERIC, char)
-          end
+          char = @cursor
+          consume
+          Token.new(ALPHANUMERIC, char)
         else
           raise "Invalid character '#{@cursor}'"
         end
