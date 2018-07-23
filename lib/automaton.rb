@@ -178,7 +178,16 @@ module Rex
     end
 
     def accept?(string)
-      # TODO
+      dfa = self.to_dfa
+      current_state = dfa.start
+      string.each_char do |char|
+        if current_state.moves[char].nonempty?
+          current_state = current_state.moves[char].unique_member
+        else
+          return false
+        end
+      end
+      dfa.accept.include?(current_state)
     end
 
     def self.from_char(char)

@@ -1,37 +1,40 @@
 module Rex
-  class Node
-    attr_accessor :left, :right, :token, :automaton
+  class AST
+    attr_accessor :root, :left, :right, :automaton
 
-    def initialize(left: nil, right: nil)
+    def initialize(root: nil, left: nil, right: nil)
+      @root = root
       @left = left
       @right = right
     end
-  end
 
-  class AST
-    attr_accessor :root, :counter
-
-    def initialize(root: nil)
-      @root = root # should be a token
+    def to_string_tree
+      # TODO
     end
 
-    def label(node = @root)
-      return if node == nil
+    def to_s
+      root # ?? TODO
+    end
 
-      label(node.left)
-      label(node.right)
+    def label
+      left.to_automaton if left
+      right.to_automaton if right
 
-      if ALPHABET.include?(node.token)
-        self.automaton = Automaton.from_char(node.token)
-      elsif node.token == '|'
+      case root.type
+      when Tokenizer::ALPHANUMERIC
+        self.automaton = Automaton.from_char(root.text)
+      when Tokenizer::ALTERNATE
         self.automaton = left.automaton.alternate(right.automaton)
-      # further cases omitted (for now)
+      when Tokenizer::CONCATENATE
+        self.automaton = left.automaton.concatenate(right.automaton)
+      when Tokenizer::STAR
+        self.automaton = left.automaton.iterate
       end
     end
 
     def to_automaton
       label
-      @root.automaton
+      automaton
     end
   end
 end
