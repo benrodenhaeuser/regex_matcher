@@ -43,8 +43,8 @@ module Rex
 
     def term
       ast = factor
-      follow = [Tokenizer::ALPHANUMERIC, Tokenizer::LPAREN]
-      return ast unless follow.include?(lookahead.type)
+      term_first = [Tokenizer::ALPHANUMERIC, Tokenizer::LPAREN]
+      return ast unless term_first.include?(lookahead.type)
       token = Token.new(Tokenizer::CONCATENATE, '')
       AST.new(root: token, left: ast, right: term)
     end

@@ -16,35 +16,29 @@ module Rex
       @source = source
       @position = 0
       @cursor = @source[@position]
-      @token = Token.new(START_TYPE, '')
     end
 
     def next_token
       consume while white_space
+      return Token.new(EOF_TYPE, '<eof>') if @cursor == EOF
 
-      @token =
-        case @cursor
-        when EOF
-          Token.new(EOF_TYPE, '<eof>')
-        when '('
-          consume
-          Token.new(LPAREN, '(')
-        when ')'
-          consume
-          Token.new(RPAREN, ')')
-        when '*'
-          consume
-          Token.new(STAR, '*')
-        when '|'
-          consume
-          Token.new(ALTERNATE, '|')
-        when *ALPHABET
-          char = @cursor
-          consume
-          Token.new(ALPHANUMERIC, char)
-        else
-          raise "Invalid character '#{@cursor}'"
-        end
+      character = @cursor
+      consume
+
+      case character
+      when '('
+        Token.new(LPAREN, character)
+      when ')'
+        Token.new(RPAREN, character)
+      when '*'
+        Token.new(STAR, character)
+      when '|'
+        Token.new(ALTERNATE, character)
+      when *ALPHABET
+        Token.new(ALPHANUMERIC, character)
+      else
+        raise "Invalid character '#{character}'"
+      end
     end
 
     def consume
