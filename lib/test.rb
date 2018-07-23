@@ -1,3 +1,4 @@
+require_relative './token.rb'
 require_relative './tokenizer.rb'
 require_relative './parser.rb'
 require_relative './tree.rb'
@@ -57,10 +58,11 @@ module Rex
   end
 
   def self.test_pipeline
-    parser = Parser.new('a|b')
-    ast = parser.parse
-    nfa = ast.to_automaton
-    dfa = nfa.to_dfa
+    parser = Parser.new('a|b')    # step 0: initialize parser with source
+    ast = parser.parse            # step 1: parse source into ast
+    nfa = ast.to_automaton        # step 2: build nfa from ast
+    dfa = nfa.to_dfa              # step 3: convert nfa to dfa
+
     p dfa.accept?('a') == true
     p dfa.accept?('b') == true
     p dfa.accept?('c') == false

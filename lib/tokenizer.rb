@@ -19,19 +19,6 @@ module Rex
       @token = Token.new(START_TYPE, '')
     end
 
-    def consume
-      @position += 1
-      @cursor = (@position < @source.length ? @source[@position] : EOF)
-    end
-
-    def match(character)
-      if @cursor == character
-        consume
-      else
-        raise "Mismatch! Expected #{character}, saw #{@cursor}"
-      end
-    end
-
     def next_token
       consume while white_space
 
@@ -62,6 +49,11 @@ module Rex
         else
           raise "Invalid character '#{@cursor}'"
         end
+    end
+
+    def consume
+      @position += 1
+      @cursor = (@position < @source.length ? @source[@position] : EOF)
     end
 
     def white_space
