@@ -8,21 +8,19 @@ module Rex
       @right = right
     end
 
-    def to_string_tree
+    def to_s
       # TODO
     end
 
-    def to_s
-      root # ?? TODO
-    end
-
-    def label
+    def label_nodes
       left.to_automaton if left
       right.to_automaton if right
 
       case root.type
       when Tokenizer::ALPHANUMERIC
-        self.automaton = Automaton.from_char(root.text)
+        self.automaton = Automaton.for_char(root.text)
+      when Tokenizer::ANYSINGLECHAR
+        self.automaton = Automaton.for_any_single_char
       when Tokenizer::ALTERNATE
         self.automaton = left.automaton.alternate(right.automaton)
       when Tokenizer::CONCATENATE
@@ -33,7 +31,7 @@ module Rex
     end
 
     def to_automaton
-      label
+      label_nodes
       automaton
     end
   end

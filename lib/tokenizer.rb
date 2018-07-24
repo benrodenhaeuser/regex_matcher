@@ -9,6 +9,7 @@ module Rex
     STAR = 5
     LPAREN = 6
     RPAREN = 7
+    ANYSINGLECHAR = 8
 
     attr_reader :cursor
 
@@ -20,25 +21,29 @@ module Rex
 
     def next_token
       consume while white_space
-      return Token.new(EOF_TYPE, '<eof>') if @cursor == EOF
 
-      character = @cursor
+      token =
+        case @cursor
+        when EOF
+          Token.new(EOF_TYPE, '<eof>')
+        when '('
+          Token.new(LPAREN, @cursor)
+        when ')'
+          Token.new(RPAREN, @cursor)
+        when '*'
+          Token.new(STAR, @cursor)
+        when '|'
+          Token.new(ALTERNATE, @cursor)
+        when '.'
+          Token.new(ANYSINGLECHAR, @cursor)
+        when *ALPHABET
+          Token.new(ALPHANUMERIC, @cursor)
+        else
+          raise "Invalid character '#{@cursor}'"
+        end
+
       consume
-
-      case character
-      when '('
-        Token.new(LPAREN, character)
-      when ')'
-        Token.new(RPAREN, character)
-      when '*'
-        Token.new(STAR, character)
-      when '|'
-        Token.new(ALTERNATE, character)
-      when *ALPHABET
-        Token.new(ALPHANUMERIC, character)
-      else
-        raise "Invalid character '#{character}'"
-      end
+      token
     end
 
     def consume

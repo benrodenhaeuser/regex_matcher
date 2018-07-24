@@ -42,9 +42,10 @@ module Rex
     end
 
     def term
+      factor_first = [Tokenizer::ALPHANUMERIC, Tokenizer::LPAREN]
+
       ast = factor
-      term_first = [Tokenizer::ALPHANUMERIC, Tokenizer::LPAREN]
-      return ast unless term_first.include?(lookahead.type)
+      return ast unless factor_first.include?(lookahead.type)
       token = Token.new(Tokenizer::CONCATENATE, '')
       AST.new(root: token, left: ast, right: term)
     end
@@ -63,12 +64,15 @@ module Rex
         token = lookahead
         match(Tokenizer::ALPHANUMERIC)
         AST.new(root: token)
+      when Tokenizer::ANYSINGLECHAR
+        token = lookahead
+        match(Tokenizer::ANYSINGLECHAR)
+        AST.new(root: token)
       when Tokenizer::LPAREN
         match(Tokenizer::LPAREN)
-        node = regex
+        ast = regex
         match(Tokenizer::RPAREN)
-        node
-      # TODO else clause to raise exception?
+        ast
       end
     end
   end
