@@ -1,10 +1,4 @@
-require_relative './set.rb'
-require_relative './token.rb'
-require_relative './tokenizer.rb'
-require_relative './parser.rb'
-require_relative './ast.rb'
-require_relative './state.rb'
-require_relative './automaton.rb'
+require_relative './engine.rb'
 
 module Rex
   def self.test_automaton
@@ -126,7 +120,7 @@ module Rex
     nfa_for_regex = ast.to_automaton
     pre = Automaton.for_wildcard.iterate
     post = Automaton.for_wildcard.iterate
-    nfa = pre.concatenate(nfa_for_regex.concatenate(post))
+    nfa = pre.concat(nfa_for_regex.concat(post))
     dfa = nfa.to_dfa
     p dfa.accept?('mabelle') == true
     p dfa.accept?('mobelle') == false
@@ -136,7 +130,7 @@ module Rex
     nfa_for_regex = ast.to_automaton
     pre = Automaton.for_wildcard.iterate
     post = Automaton.for_wildcard.iterate
-    nfa = pre.concatenate(nfa_for_regex.concatenate(post))
+    nfa = pre.concat(nfa_for_regex.concat(post))
     dfa = nfa.to_dfa
     p dfa.accept?('mabelle') == true
     p dfa.accept?('mobelle') == false

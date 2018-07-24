@@ -23,8 +23,7 @@ module Rex
         new(start: start, accept: Set[accept_state])
       end
 
-      # build automaton from abstract syntax tree
-      # notice the recursion: AST#to_automaton calls this method
+      # recursively build automaton from abstract syntax tree
       def from_ast(ast)
         case ast.root.type
         when Tokenizer::ALPHANUMERIC
@@ -34,7 +33,7 @@ module Rex
         when Tokenizer::ALTERNATE
           ast.left.to_automaton.alternate(ast.right.to_automaton)
         when Tokenizer::CONCATENATE
-          ast.left.to_automaton.concatenate(ast.right.to_automaton)
+          ast.left.to_automaton.concat(ast.right.to_automaton)
         when Tokenizer::STAR
           ast.left.to_automaton.iterate
         end
@@ -52,7 +51,7 @@ module Rex
       self
     end
 
-    def concatenate(other)
+    def concat(other)
       accept.unique_member.moves[SILENT] = Set[other.start]
       self.accept = other.accept
       self
