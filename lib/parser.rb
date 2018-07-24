@@ -64,9 +64,9 @@ module Rex
         token = lookahead
         match(Tokenizer::ALPHANUMERIC)
         AST.new(root: token)
-      when Tokenizer::ANYSINGLECHAR
+      when Tokenizer::WILDCARD
         token = lookahead
-        match(Tokenizer::ANYSINGLECHAR)
+        match(Tokenizer::WILDCARD)
         AST.new(root: token)
       when Tokenizer::LPAREN
         match(Tokenizer::LPAREN)

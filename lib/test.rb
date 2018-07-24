@@ -1,7 +1,8 @@
+require_relative './set.rb'
 require_relative './token.rb'
 require_relative './tokenizer.rb'
 require_relative './parser.rb'
-require_relative './tree.rb'
+require_relative './ast.rb'
 require_relative './state.rb'
 require_relative './automaton.rb'
 
@@ -123,8 +124,8 @@ module Rex
     parser = Parser.new('ab')
     ast = parser.parse
     nfa_for_regex = ast.to_automaton
-    pre = Automaton.for_any_single_char.iterate
-    post = Automaton.for_any_single_char.iterate
+    pre = Automaton.for_wildcard.iterate
+    post = Automaton.for_wildcard.iterate
     nfa = pre.concatenate(nfa_for_regex.concatenate(post))
     dfa = nfa.to_dfa
     p dfa.accept?('mabelle') == true
@@ -133,8 +134,8 @@ module Rex
     parser = Parser.new('ab*')
     ast = parser.parse
     nfa_for_regex = ast.to_automaton
-    pre = Automaton.for_any_single_char.iterate
-    post = Automaton.for_any_single_char.iterate
+    pre = Automaton.for_wildcard.iterate
+    post = Automaton.for_wildcard.iterate
     nfa = pre.concatenate(nfa_for_regex.concatenate(post))
     dfa = nfa.to_dfa
     p dfa.accept?('mabelle') == true
@@ -145,9 +146,9 @@ module Rex
   end
 end
 
-# Rex.test_automaton
-# Rex.test_tokenizer
-# Rex.test_parser
-# Rex.test_pipeline
-# Rex.test_any_char
+Rex.test_automaton
+Rex.test_tokenizer
+Rex.test_parser
+Rex.test_pipeline
+Rex.test_any_char
 Rex.test_substring_matching

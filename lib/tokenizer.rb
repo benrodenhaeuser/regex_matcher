@@ -9,7 +9,7 @@ module Rex
     STAR = 5
     LPAREN = 6
     RPAREN = 7
-    ANYSINGLECHAR = 8
+    WILDCARD = 8
 
     attr_reader :cursor
 
@@ -35,7 +35,7 @@ module Rex
         when '|'
           Token.new(ALTERNATE, @cursor)
         when '.'
-          Token.new(ANYSINGLECHAR, @cursor)
+          Token.new(WILDCARD, @cursor)
         when *ALPHABET
           Token.new(ALPHANUMERIC, @cursor)
         else
