@@ -56,6 +56,8 @@ module Rex
     end
 
     def next_token
+      consume while white_space
+
       token =
         case @cursor
         when EOF
@@ -90,6 +92,11 @@ module Rex
     def consume
       @position += 1
       @cursor = (@position < @source.length ? @source[@position] : EOF)
+    end
+
+    # TODO: take into account other "kinds" of whitespace?
+    def white_space
+      [' ', '\n'].include?(@cursor)
     end
   end
 
@@ -401,7 +408,7 @@ module Rex
         end
       end
 
-      Automaton.new(
+      DFA.new(
         initial:  dfa_initial,
         terminal: dfa_terminal,
         alphabet: alphabet,
@@ -449,6 +456,7 @@ module Rex
       @alphabet ||= compute_alphabet
     end
 
+    # if @alphabet has not been set, compute it on the fly
     def compute_alphabet
       chars = Set.new
 
@@ -459,6 +467,7 @@ module Rex
       Set[*chars.reject { |char| char == '' }]
     end
 
+    # if @states has not been set, compute it on the fly
     def states
       @states ||= compute_states
     end
@@ -468,12 +477,7 @@ module Rex
     end
 
     def to_s
-      index = 0
-      states.each do |state|
-        state.label = "q#{index}"
-        index += 1
-      end
-
+      label_all_states
       transitions = states.map(&:transition_string).compact.join("\n")
       "states: #{states}" \
         "\ninitial: #{initial}" \
@@ -481,98 +485,83 @@ module Rex
         "\nalphabet: #{alphabet}" \
         "\ntransitions:\n#{transitions}"
     end
-  end
 
-  class Query
-    attr_reader   :line
-    attr_reader   :automaton
-    attr_accessor :from
-    attr_accessor :to
+    def label_all_states # for pretty printout
+      index = 0
 
-    def initialize(line, automaton)
-      @line = line
-      @automaton = automaton
-
-      match!
-    end
-
-    def match!
-  	  (0..@line.length).each do |index|
-        @from = index
-    		state = automaton.initial
-        position = index
-
-    		while cursor = @line[position]
-          break unless state.moves[cursor]
-    			state = state.moves[cursor].elem
-    			@to = position if automaton.terminal.include?(state)
-    			position += 1
-  		 	end
-
-    		break if match?
-  	  end
-  	end
-
-    def match?
-      from && to
+      states.each do |state|
+        state.label = "q#{index}"
+        index += 1
+      end
     end
   end
 
-  class Matcher
+  class DFA < Automaton
+    def accept?(line, from, to, state = initial)
+      return false if from > (to + 1)
+      return true if from == (to + 1) && terminal.include?(state)
+
+      if state.moves['\^']
+        return true if from == 0 &&
+          accept?(line, from, to, state.moves['\^'].elem)
+      end
+
+      if state.moves['\$']
+        return true if from == line.length - 1 &&
+          accept?(line, from, to, state.moves['\$'].elem)
+      end
+
+      if state.moves[line[from]]
+        return true if accept?(line, from + 1, to, state.moves[line[from]].elem)
+      end
+
+      nil
+    end
+  end
+
+  class Engine
     def initialize(pattern, path, substitution = nil)
-      @pattern = pattern
-      @path = path
+      @pattern      = pattern
+      @path         = path
       @substitution = substitution
-    end
-
-    def automaton
-      @automaton ||= Parser.new(@pattern).parse.to_automaton.to_dfa
+      @line_index   = 0
     end
 
     def search
-      file = File.open(@path)
-      line_no = 0
+      @file = File.open(@path)
 
-      while line = file.gets
-        line_no += 1
-        @query = Query.new(line, automaton)
-        puts_line(line_no) if @query.match?
+      while line = @file.gets
+        @line_index += 1
+        next unless indices = match(line)
+        from, to = indices
+        pre_match = line[0...from]
+        match = line[from..to].colorize(:light_green).underline
+        # ^ TODO: make match highlighting smart
+        post_match = line[to + 1...line.length]
+        puts "#{pad(@line_index)}:  " + pre_match + match + post_match
       end
 
-      file.close
+      @file.close
     end
 
     def replace
-      file = File.open(@path)
+      @file = File.open(@path)
 
-      while line = file.gets
-        @query = Query.new(line, automaton)
-        @query.match? ? puts_line : (puts line)
-      end
-    end
-
-    def puts_line(line_no = nil)
-      line = @query.line
-      from = @query.from
-      to =  @query.to
-
-      pre = line[0...from]
-      match = line[from..to]
-      post = line[to + 1...line.length]
-
-      match_output = @substitution ? @substitution : match
-
-      if $stdout.isatty
-        match_output = match_output.colorize(:light_green).underline
+      while line = @file.gets
+        @line_index += 1
+        if indices = match(line)
+          from, to = indices
+          pre_match = line[0...from]
+          post_match = line[to + 1...line.length]
+          sub = @substitution.colorize(:light_green).underline
+          # ^ TODO: make match highlighting smart
+          puts pre_match + sub + post_match
+        else
+          puts line
+        end
       end
 
-      output_string = pre + match_output + post
-
-      if line_no
-        output_string = "#{pad(line_no)}:  " + output_string
-      end
-
-      puts output_string
+      @file.close
     end
 
     # todo: refactor for readability
@@ -580,6 +569,22 @@ module Rex
     def pad(number)
       line_count = %x{wc -l #{@path}}.split.first
       format("%0#{line_count.length}d", number.to_s)
+    end
+
+    # favours matches that start earlier
+    # among those, favours long matches
+    # Unfortunately, this is O(n2)
+    def match(line)
+      0.upto(line.length - 1) do |from|
+        (line.length - 1).downto(from) do |to|
+          return [from, to] if automaton.accept?(line, from, to)
+        end
+      end
+      nil
+    end
+
+    def automaton
+      @automaton ||= Parser.new(@pattern).parse.to_automaton.to_dfa
     end
   end
 
@@ -589,12 +594,14 @@ module Rex
       when 'search'
         pattern = ARGV.shift
         path = ARGV.shift
-        Matcher.new(pattern, path).search
-      when 'replace'
+        engine = Engine.new(pattern, path)
+        engine.search
+      when 'sub'
         pattern = ARGV.shift
         substitution = ARGV.shift
         path = ARGV.shift
-        Matcher.new(pattern, path, substitution).replace
+        engine = Engine.new(pattern, path, substitution)
+        engine.replace
       end
     end
   end

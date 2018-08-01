@@ -128,12 +128,10 @@ module Rex
     dfa.accept?('mo') == false       # true
   end
 
-  def self.test_matcher
-    matcher = Matcher.new(pattern: "a|A", path: "./test/file.txt")
-    puts "pattern: a|A"
-    puts "matches:"
-    puts
-    matcher.matches.each { |match| puts match }
+  def self.test_engine
+    $stdout = File.open('./test/results.rb', 'w')
+    # STDOUT.puts $stdout.isatty
+    Matcher.new("a", "./test/file.txt").search
   end
 end
 
@@ -143,4 +141,4 @@ end
 # Rex.test_pipeline
 # Rex.test_any_char
 # Rex.test_substring_matching
-Rex.test_matcher
+Rex.test_engine
