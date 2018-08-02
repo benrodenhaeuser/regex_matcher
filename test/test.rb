@@ -1,4 +1,4 @@
-require_relative '../lib/everything.rb'
+require_relative '../lib/main.rb'
 require 'benchmark'
 
 module Rex
@@ -129,7 +129,7 @@ module Rex
   end
 
   def self.test_engine
-    $stdout = File.open('./test/results.rb', 'w')
+    # $stdout = File.open('./test/results.rb', 'w') # output to file!
     # STDOUT.puts $stdout.isatty
     Matcher.new("a", "./test/file.txt").search
   end

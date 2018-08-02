@@ -1,5 +1,5 @@
 #! /usr/bin/env ruby
 
-require_relative './lib/everything.rb'
+require_relative './lib/cli.rb'
 
 Rex::CLI.run
