@@ -8,29 +8,47 @@ module Rex
   class Matcher
     attr_reader :matches
 
-    def initialize(pattern, path, substitution = nil, global = true, line_numbers = true)
+    def initialize(pattern:, path:, options: {})
       @pattern = pattern
       @path = path
-      @automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      @substitution = substitution
-      @global = true
-      @line_numbers = line_numbers
+      @substitution = options[:substitution]
+      @global = options[:global]
+      @line_numbers = options[:line_numbers]
+      @non_matching = options[:non_matching]
     end
 
-    def match!
+    def automaton
+      @automaton ||= Parser.new(@pattern).parse.to_automaton.to_dfa
+    end
+
+    def match
+      file = File.open(@path)
+
+      @line_number = 1
+
+      while @line = file.gets
+        match_line
+        output_line
+        @line_number += 1
+      end
+
+      file.close
+    end
+
+    def match_line
       @matches = []
       @from = nil
       @to = nil
 
       (0..@line.length).each do |index|
         @from = index
-        state = @automaton.initial
+        state = automaton.initial
         position = index
 
         while cursor = @line[position]
           if state.moves[cursor]
             state = state.moves[cursor].elem
-            @to = position if @automaton.terminal.include?(state)
+            @to = position if automaton.terminal.include?(state)
             position += 1
           else
             if @from && @to
@@ -38,11 +56,11 @@ module Rex
               @to = nil
               break unless @global
               @from = position
-              state = @automaton.initial
+              state = automaton.initial
             else
               position += 1
               @from = position
-              state = @automaton.initial
+              state = automaton.initial
             end
           end
         end
@@ -51,31 +69,25 @@ module Rex
       end
     end
 
-
-    def match
-      file = File.open(@path)
-
-      @line_number = 1
-
-      while @line = file.gets
-        match!
-        output
-        @line_number += 1
-      end
-
-      file.close
-    end
-
-    def output
+    def output_line
       if @matches.empty?
+        return unless @non_matching
         result_line = @line
       else
         the_matches = @matches.map.with_index do |elem, index|
           if index.even?
-            if $stdout.isatty
-              @line[elem..@matches[index + 1]].colorize(:light_green).underline
+            if @substitution
+              if $stdout.isatty
+                @substitution.colorize(:light_green).underline
+              else
+                @substitution
+              end
             else
-              @line[elem..@matches[index + 1]]
+              if $stdout.isatty # substitution (same logic again)
+                @line[elem..@matches[index + 1]].colorize(:light_green).underline
+              else
+                @line[elem..@matches[index + 1]]
+              end
             end
           elsif @matches[index + 1]
             @line[@matches[index] + 1...@matches[index + 1]]
