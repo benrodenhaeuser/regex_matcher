@@ -6,14 +6,10 @@ require 'colorize'
 
 module Rex
   class Matcher
-    attr_reader :line
-    attr_reader :automaton
-
     def initialize(pattern:, path:, opts: {})
-      @pattern = pattern
-      @path    = path
-      @opts    = opts
-
+      @pattern   = pattern
+      @path      = path
+      @opts      = opts
       @automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
       @line      = nil
     end
@@ -26,13 +22,25 @@ module Rex
         @line = Line.new(file.gets, line_number, @opts[:substitution])
 
         find_matches
-        line.process if line.saved_match? && (stdout_is_tty? || @opts[:substitution])
-        line.output if line.saved_match? || @opts[:output_non_matching]
+
+        if line.saved_match? && (stdout_is_tty? || @opts[:substitution])
+          line.process_matches
+        end
+
+        if line.saved_match? || @opts[:output_non_matching]
+          line.output
+        end
+
         line_number += 1
       end
 
       file.close
     end
+
+    private
+
+    attr_reader :line
+    attr_reader :automaton
 
     def find_matches
       (0..@line.length).each do |index|
@@ -45,9 +53,9 @@ module Rex
       line.reset(index)
 
       while line.cursor
-        if automaton.step?(line.cursor)
+        if automaton.possible_step?(line.cursor)
           automaton.step(line.cursor)
-          line.matched! if automaton.terminal?
+          line.match! if automaton.terminal?
           line.consume
         else
           if line.match?
@@ -61,10 +69,10 @@ module Rex
           automaton.reset
         end
       end
+    end
 
-      def stdout_is_tty?
-        $stdout.isatty
-      end
+    def stdout_is_tty?
+      $stdout.isatty
     end
   end
 end

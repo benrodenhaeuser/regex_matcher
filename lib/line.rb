@@ -41,7 +41,7 @@ module Rex
       [@from, @to]
     end
 
-    def matched!
+    def match!
       @to = @position
     end
 
@@ -57,7 +57,7 @@ module Rex
       puts self
     end
 
-    def process
+    def process_matches
       @matches.reverse.each do |match|
         substitute(match.first, match.last)
       end

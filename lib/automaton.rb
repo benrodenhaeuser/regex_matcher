@@ -1,12 +1,8 @@
 require 'set'
 
 class Set
-  def singleton?
-    size == 1
-  end
-
   def elem
-    raise 'Not a singleton!' unless singleton?
+    raise 'Not a singleton!' unless size == 1
     to_a.first
   end
 
@@ -263,7 +259,7 @@ module Rex
       @current = @initial
     end
 
-    def step?(char)
+    def possible_step?(char)
       current.moves[char]
     end
 
