@@ -4,20 +4,20 @@ module Rex
   class CLI
     SEARCH_OPTS = {
       line_numbers: false,
-      global: false,
-      non_matching: false
+      global_matching: false,
+      output_non_matching: false
     }
 
     SCAN_OPTS = {
       line_numbers: true,
-      global: true,
-      non_matching: false
+      global_matching: true,
+      output_non_matching: false
     }
 
     REPLACE_OPTS = {
       line_numbers: false,
-      global: true,
-      non_matching: true
+      global_matching: true,
+      output_non_matching: true
     }
 
     def self.run
@@ -28,7 +28,7 @@ module Rex
         Matcher.new(
           pattern: pattern,
           path: path,
-          options: SEARCH_OPTS
+          opts: SEARCH_OPTS
         ).match
       when 'scan'
         pattern = ARGV.shift
@@ -36,7 +36,7 @@ module Rex
         Matcher.new(
           pattern: pattern,
           path: path,
-          options: SCAN_OPTS
+          opts: SCAN_OPTS
         ).match
       when 'replace'
         pattern = ARGV.shift
@@ -46,7 +46,7 @@ module Rex
         Matcher.new(
           pattern: pattern,
           path: path,
-          options: opts
+          opts: opts
         ).match
       end
     end

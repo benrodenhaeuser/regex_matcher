@@ -129,7 +129,7 @@ module Rex
       AST.new(root: token, left: ast)
     end
 
-    def atomic_ast(lookahead)
+    def atomic
       token = lookahead
       match(token.type)
       AST.new(root: token)
@@ -144,7 +144,7 @@ module Rex
       type = lookahead.type
 
       if atomic_expressions.include?(type)
-        atomic_ast(lookahead)
+        atomic
       elsif type == Tokenizer::LPAREN
         match(Tokenizer::LPAREN)
         ast = regex
