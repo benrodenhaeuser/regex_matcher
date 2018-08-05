@@ -18,7 +18,7 @@ module Rex
 
     attr_reader   :moves
     attr_accessor :label
-    attr_accessor :data
+    attr_accessor :data      # TODO: not very descriptive
 
     def initialize(label: nil, data: nil)
       @moves = {}

@@ -10,8 +10,6 @@ module Rex
       @pattern   = pattern
       @path      = path
       @opts      = opts
-      @automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      @line      = nil
     end
 
     def match
@@ -39,11 +37,16 @@ module Rex
 
     private
 
-    attr_reader :line
-    attr_reader :automaton
+    def automaton
+      @automaton ||= Parser.new(@pattern).parse.to_automaton.to_dfa
+    end
+
+    def line
+      @line
+    end
 
     def find_matches
-      (0..@line.length).each do |index|
+      (0..line.length).each do |index|
         find_matches_starting_at(index)
         break if line.saved_match?
       end
