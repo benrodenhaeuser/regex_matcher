@@ -1,4 +1,4 @@
-require_relative '../lib/main.rb'
+require_relative '../lib/matcher.rb'
 require 'benchmark'
 
 module Rex
@@ -10,23 +10,28 @@ module Rex
     puts automaton # transition table
     puts
     puts "State space:"
-    puts automaton.state_space # a set of eight states
+    puts automaton.states # a set of eight states
+    puts "`automaton.initial.reachable`:"
+    puts automaton.initial.reachable
     puts "Alphabet:"
     puts automaton.alphabet # set containing 'c' and 'd'
     puts "Epsilon closure of start state:"
-    puts Set[*automaton.start.epsilon_closure.map(&:label)]
+    puts Set[*automaton.initial.epsilon_closure.map(&:label)]
     # {q0, q1, q2, q4, q5, q6}
     puts
-    dfa = automaton.to_dfa # looks odd
+    dfa = automaton.to_dfa
     puts "Converted to dfa via Subset construction:"
     puts dfa
     puts
+    puts "`dfa.initial.alphabet`:"
+    p dfa.initial.alphabet
+    puts
     puts "State space of dfa:"
-    puts dfa.state_space
+    puts dfa.states
     puts "Accepting states of dfa:"
-    puts dfa.accept
+    puts dfa.terminal
     puts "Start state of dfa:"
-    puts dfa.start
+    puts dfa.initial
   end
 
   def self.test_tokenizer
@@ -135,10 +140,10 @@ module Rex
   end
 end
 
-# Rex.test_automaton
+Rex.test_automaton
 # Rex.test_tokenizer
 # Rex.test_parser
 # Rex.test_pipeline
 # Rex.test_any_char
 # Rex.test_substring_matching
-Rex.test_engine
+# Rex.test_engine

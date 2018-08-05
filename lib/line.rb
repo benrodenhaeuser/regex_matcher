@@ -49,7 +49,7 @@ module Rex
       @matches << match
     end
 
-    def saved_match?
+    def found_match?
       !@matches.empty?
     end
 
@@ -57,7 +57,7 @@ module Rex
       puts self
     end
 
-    def process_matches
+    def process
       @matches.reverse.each do |match|
         substitute(match.first, match.last)
       end

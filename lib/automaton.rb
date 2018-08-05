@@ -1,8 +1,12 @@
 require 'set'
 
 class Set
+  def singleton?
+    size == 1
+  end
+
   def elem
-    raise 'Not a singleton!' unless size == 1
+    raise 'Not a singleton!' unless singleton?
     to_a.first
   end
 
@@ -18,7 +22,7 @@ module Rex
 
     attr_reader   :moves
     attr_accessor :label
-    attr_accessor :data      # TODO: not very descriptive
+    attr_accessor :data
 
     def initialize(label: nil, data: nil)
       @moves = {}
@@ -26,11 +30,39 @@ module Rex
       @data  = data
     end
 
+    def chars
+      moves.keys.reject { |key| key == SILENT }
+    end
+
+    def neighbors
+      moves.each_value.with_object(Set.new) do |set_of_states, collection|
+        collection.merge(set_of_states)
+      end
+    end
+
+    def reachable(collection = Set[self])
+      neighbors.each_with_object(collection) do |neighbor, coll|
+        next if coll.include?(neighbor)
+        coll.add(neighbor)
+        neighbor.reachable(coll)
+      end
+    end
+
+    def epsilon_closure(collection = Set[self])
+      neighbors.each_with_object(collection) do |neighbor, coll|
+        next if coll.include?(neighbor)
+        if moves[SILENT] && moves[SILENT].include?(neighbor)
+          coll.add(neighbor)
+          neighbor.epsilon_closure(coll)
+        end
+      end
+    end
+
     def to_s
       label
     end
 
-    def transition_string
+    def collect_transitions
       return nil if neighbors.empty?
 
       moves.map do |char, accessible_states|
@@ -41,38 +73,8 @@ module Rex
       end.join("\n")
     end
 
-    def chars
-      moves.keys.reject { |key| key == SILENT }
-    end
-
-    def neighbors
-      moves.each_with_object(Set.new) do |(_, set_of_states), collection|
-        set_of_states.each do |state|
-          collection.add(state) unless collection.include?(state)
-        end
-      end
-    end
-
-    def reachable(collection = Set[self])
-      neighbors.each do |neighbor|
-        next if collection.include?(neighbor)
-        collection.add(neighbor)
-        neighbor.reachable(collection)
-      end
-
-      collection
-    end
-
-    def epsilon_closure(collection = Set[self])
-      neighbors.each do |neighbor|
-        next if collection.include?(neighbor)
-        if moves[SILENT] && moves[SILENT].include?(neighbor)
-          collection.add(neighbor)
-          neighbor.epsilon_closure(collection)
-        end
-      end
-
-      collection
+    def alphabet
+      moves.keys
     end
   end
 
@@ -133,8 +135,7 @@ module Rex
       self.initial = new_initial_state
       self.terminal = Set[new_terminal_state]
       alphabet.merge(other.alphabet)
-      states.merge(other.states).add(new_initial_state).add(new_terminal_state)
-      # ^ TODO: simplify?
+      states.merge(other.states).merge([new_initial_state,new_terminal_state])
       self
     end
 
@@ -153,8 +154,7 @@ module Rex
       new_initial_state.moves[SILENT] = Set[initial, new_terminal_state]
       self.initial = new_initial_state
       self.terminal = Set[new_terminal_state]
-      states.add(new_initial_state).add(new_terminal_state)
-      # ^ TODO: simplify?
+      states.merge([new_initial_state, new_terminal_state])
       self
     end
   end
@@ -163,23 +163,20 @@ module Rex
     def to_dfa
       dfa_initial = State.new(data: epsilon_closure(Set[initial]))
       dfa_terminal = Set.new
-
       dfa_states = Set[dfa_initial]
       stack = [dfa_initial]
 
       until stack.empty?
         q = stack.pop
 
-        if q.data.any? { |substate| terminal.include?(substate) }
-          dfa_terminal.add(q)
-        end
+        dfa_terminal.add(q) if q.data.any? { |elem| terminal.include?(elem) }
 
         alphabet.each do |char|
-          the_neighbors = neighbors(q.data, char)
+          the_neighbors = char_neighbors(q.data, char)
           next if the_neighbors.empty?
           data = epsilon_closure(the_neighbors)
           t = find_state(dfa_states, data) || State.new(data: data)
-          q.moves[char] = Set[t]
+          q.moves[char] = Set[t] # singleton!
           unless find_state(dfa_states, data)
             dfa_states.add(t)
             stack.push(t)
@@ -196,23 +193,19 @@ module Rex
     end
 
     def epsilon_closure(set_of_states)
-      the_epsilon_closure = Set.new
-      set_of_states.each do |state|
-        the_epsilon_closure.merge(state.epsilon_closure)
+      set_of_states.each_with_object(Set.new) do |state, closure|
+        closure.merge(state.epsilon_closure)
       end
-      the_epsilon_closure
     end
 
-    def neighbors(set_of_states, char)
-      the_neighbors = Set.new
-      set_of_states.each do |state|
-        the_neighbors.merge(state.moves[char]) if state.moves[char]
+    def char_neighbors(set_of_states, char)
+      set_of_states.each_with_object(Set.new) do |state, nb_set|
+        nb_set.merge(state.moves[char]) if state.moves[char]
       end
-      the_neighbors
     end
 
-    def find_state(dfa_states, data)
-      dfa_states.find { |state| state.data == data }
+    def find_state(set_of_states, data)
+      set_of_states.find { |state| state.data == data }
     end
   end
 
@@ -238,13 +231,11 @@ module Rex
     end
 
     def compute_alphabet
-      chars = Set.new
-
-      states.each do |state|
-        chars.merge(Set[*state.moves.keys])
+      alphabet = states.each_with_object(Set.new) do |state, alph|
+        alph.merge(state.alphabet)
       end
 
-      Set[*chars.reject { |char| char == '' }]
+      Set[*alphabet.reject { |char| char == '' }]
     end
 
     def states
@@ -263,9 +254,11 @@ module Rex
       current.moves[char]
     end
 
-    # TODO: assumes a dfa!
     def step(char)
-      raise "Not available: #{char}" unless @current.moves[char]
+      char_neighbors = @current.moves[char]
+      raise "Not available: #{char}" unless char_neighbors
+      raise "Nondeterministic step: #{char}" unless char_neighbors.singleton
+
       @current = @current.moves[char].elem
     end
 
@@ -274,13 +267,10 @@ module Rex
     end
 
     def to_s
-      index = 0
-      states.each do |state|
-        state.label = "q#{index}"
-        index += 1
-      end
+      states.each.with_index { |state, index| state.label = "q#{index}" }
 
-      transitions = states.map(&:transition_string).compact.join("\n")
+      transitions = states.map(&:collect_transitions).compact.join("\n")
+
       "states: #{states}" \
         "\ninitial: #{initial}" \
         "\nterminal: #{terminal}" \

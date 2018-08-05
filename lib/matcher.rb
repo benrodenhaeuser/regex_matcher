@@ -20,14 +20,8 @@ module Rex
         @line = Line.new(file.gets, line_number, @opts[:substitution])
 
         find_matches
-
-        if line.saved_match? && (stdout_is_tty? || @opts[:substitution])
-          line.process_matches
-        end
-
-        if line.saved_match? || @opts[:output_non_matching]
-          line.output
-        end
+        line.process if line.found_match? && (tty? || @opts[:substitution])
+        line.output if line.found_match? || @opts[:output_non_matching]
 
         line_number += 1
       end
@@ -74,7 +68,7 @@ module Rex
       end
     end
 
-    def stdout_is_tty?
+    def tty?
       $stdout.isatty
     end
   end
