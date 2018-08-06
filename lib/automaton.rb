@@ -257,7 +257,7 @@ module Rex
     def step(char)
       char_neighbors = @current.moves[char]
       raise "Not available: #{char}" unless char_neighbors
-      raise "Nondeterministic step: #{char}" unless char_neighbors.singleton
+      raise "Nondeterministic step: #{char}" unless char_neighbors.singleton?
 
       @current = @current.moves[char].elem
     end

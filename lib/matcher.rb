@@ -2,14 +2,19 @@ require_relative './parser.rb'
 require_relative './automaton.rb'
 require_relative './line.rb'
 
-require 'colorize'
-
 module Rex
   class Matcher
-    def initialize(pattern:, path:, opts: {})
-      @pattern   = pattern
-      @path      = path
-      @opts      = opts
+    DEFAULT_OPTIONS = {
+      line_numbers:        true,
+      global_matching:     true,
+      output_non_matching: false
+    }
+
+    def initialize(pattern:, path:, substitution: nil, user_options: {})
+      @pattern      = pattern
+      @path         = path
+      @substitution = substitution
+      @opts         = DEFAULT_OPTIONS.merge(user_options)
     end
 
     def match
@@ -17,10 +22,15 @@ module Rex
       line_number = 1
 
       until file.eof?
-        @line = Line.new(file.gets, line_number, @opts[:substitution])
+        @line = Line.new(
+          text:         file.gets,
+          line_number:  line_number,
+          substitution: @substitution
+        )
 
         find_matches
-        line.process if line.found_match? && (tty? || @opts[:substitution])
+        line.process_matches if line.found_match?
+        line.prepend_line_number(line_count) if @opts[:line_numbers]
         line.output if line.found_match? || @opts[:output_non_matching]
 
         line_number += 1
@@ -39,10 +49,14 @@ module Rex
       @line
     end
 
+    def line_count
+      %x{wc -l #{@path}}.split.first
+    end
+
     def find_matches
       (0..line.length).each do |index|
         find_matches_starting_at(index)
-        break if line.saved_match?
+        break if line.found_match?
       end
     end
 
@@ -66,10 +80,6 @@ module Rex
           automaton.reset
         end
       end
-    end
-
-    def tty?
-      $stdout.isatty
     end
   end
 end

@@ -1,6 +1,8 @@
+require 'colorize'
+
 module Rex
   class Line
-    def initialize(text, line_number, substitution = nil)
+    def initialize(text:, line_number: nil, substitution: nil)
       @text = text
       @line_number = line_number
       @substitution = substitution
@@ -49,6 +51,11 @@ module Rex
       @matches << match
     end
 
+    def prepend_line_number(line_count)
+      pad = format("%0#{line_count.length}d:  ", @line_number.to_s)
+      @text = pad + @text
+    end
+
     def found_match?
       !@matches.empty?
     end
@@ -57,29 +64,35 @@ module Rex
       puts self
     end
 
-    def process
+    def process_matches
       @matches.reverse.each do |match|
-        substitute(match.first, match.last)
+        process_match(match.first, match.last)
       end
     end
 
     private
 
-    # TODO: unfortunate choice of name
-    # TODO: @substitution and line numbers (pad method)
-    def substitute(from, to)
+    def process_match(from, to)
       pre       = @text[0...from]
       the_match = @text[from..to]
       post      = @text[to + 1...length]
-
-      the_match = the_match.colorize(:light_green).underline
-      @text     = pre + the_match + post
+      @text     = pre + replace(the_match) + post
     end
 
-    # https://stackoverflow.com/questions/2650517
-    def pad(number)
-      line_count = %x{wc -l #{@path}}.split.first
-      format("%0#{line_count.length}d:  ", number.to_s)
+    def replace(the_match)
+      if tty? && @substitution
+        @substitution.colorize(:light_green).underline
+      elsif tty?
+        the_match.colorize(:light_green).underline
+      elsif @substitution
+        @substitution
+      else
+        the_match
+      end
+    end
+
+    def tty?
+      $stdout.isatty
     end
   end
 end
