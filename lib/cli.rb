@@ -16,15 +16,15 @@ module Rex
         opts.banner = "Usage: rex [options] pattern path [substitution]"
 
         opts.on("--no-line-numbers", "Disable line numbers") do |v|
-          @options[:line_numbers] = false
+          options[:line_numbers] = false
         end
 
         opts.on("--no-global-matching", "Disable global matching") do |v|
-          @options[:global_matching] = false
+          options[:global_matching] = false
         end
 
-        opts.on("--non-matches", "Output lines without matches") do |v|
-          @options[:output_non_matching] = true
+        opts.on("--output-non-matching", "Output lines without matches") do |v|
+          options[:output_non_matching] = true
         end
       end
 

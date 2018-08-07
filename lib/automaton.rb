@@ -248,13 +248,14 @@ module Rex
 
     def reset
       @current = @initial
+      self
     end
 
-    def possible_step?(char)
+    def step?(char)
       current.moves[char]
     end
 
-    def step(char)
+    def step!(char)
       char_neighbors = @current.moves[char]
       raise "Not available: #{char}" unless char_neighbors
       raise "Nondeterministic step: #{char}" unless char_neighbors.singleton?

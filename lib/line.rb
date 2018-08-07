@@ -2,7 +2,7 @@ require 'colorize'
 
 module Rex
   class Line
-    def initialize(text:, line_number: nil, substitution: nil)
+    def initialize(text:, line_number:, substitution:)
       @text = text
       @line_number = line_number
       @substitution = substitution
@@ -64,6 +64,25 @@ module Rex
       puts self
     end
 
+    def find_matches(automaton, global)
+      setup(0)
+
+      while cursor
+        @to = @position if automaton.terminal?
+        if automaton.step?(cursor)
+          automaton.step!(cursor)
+          consume
+        else
+          if @to
+            @matches << [@from, @to]
+            break unless global
+          end
+          setup([@from + 1, @to].compact.max)
+          automaton.reset
+        end
+      end
+    end
+
     def process_matches
       @matches.reverse.each do |match|
         process_match(match.first, match.last)
@@ -72,10 +91,16 @@ module Rex
 
     private
 
+    def setup(index)
+      @position = index
+      @from = @position
+      @to = nil
+    end
+
     def process_match(from, to)
       pre       = @text[0...from]
-      the_match = @text[from..to]
-      post      = @text[to + 1...length]
+      the_match = @text[from...to]
+      post      = @text[to...length]
       @text     = pre + replace(the_match) + post
     end
 
