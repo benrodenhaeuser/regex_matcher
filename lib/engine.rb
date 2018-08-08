@@ -18,6 +18,7 @@ module Rex
       @path         = path
       @substitution = substitution
       @opts         = DEFAULT_OPTIONS.merge(user_options)
+      
       @automaton    = Parser.new(@pattern).parse.to_automaton.to_dfa
     end
 
