@@ -1,26 +1,46 @@
 require 'colorize'
 
 module Rex
+  class Match
+    attr_accessor :from
+    attr_accessor :to
+
+    def initialize(position)
+      @from = position
+      @to = nil
+    end
+
+    def found?
+      @to
+    end
+  end
+
+  # the Line class should be simpler: it's just a piece of text with a current index
+
+  # and we need another class that matches up lines and automaton
+
   class Line
     def initialize(text:, line_number:, substitution:)
       @text = text
       @line_number = line_number
       @substitution = substitution
+      @position = 0
       @matches = []
     end
 
     def find_matches(automaton, global)
-      setup(0)
+      @match = Match.new(@position)
 
       while cursor
-        match = find_match(automaton)
+        find_match(automaton)
 
-        if match
-          @matches << match
+        if @match.found?
+          @matches << @match
           break unless global
         end
 
-        setup([@from + 1, @to].compact.max)
+        @position = [@match.from + 1, @match.to].compact.max
+        @match = Match.new(@position)
         automaton.reset
       end
     end
@@ -29,9 +49,8 @@ module Rex
       while automaton.step?(cursor)
         automaton.step!(cursor)
         consume
-        @to = @position if automaton.terminal?
+        @match.to = @position if automaton.terminal?
       end
-      @to ? [@from, @to] : nil
     end
 
     def found_match?
@@ -40,7 +59,7 @@ module Rex
 
     def process_matches
       @matches.reverse.each do |match|
-        process_match(match.first, match.last)
+        process_match(match.from, match.to)
       end
     end
 

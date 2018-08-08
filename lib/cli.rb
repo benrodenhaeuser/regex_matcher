@@ -1,12 +1,12 @@
 require 'optparse'
-require_relative './matcher.rb'
+require_relative './engine.rb'
 
 module Rex
   class CLI
-    def self.run
+    def self.execute
       options = parse_options
       arguments = parse_arguments
-      match(arguments, options)
+      run(arguments, options)
     end
 
     def self.parse_options
@@ -41,13 +41,13 @@ module Rex
       }
     end
 
-    def self.match(arguments, options)
-      Matcher.new(
+    def self.run(arguments, options)
+      Engine.new(
         pattern:      arguments[:pattern],
         path:         arguments[:path],
         substitution: arguments[:substitution],
         user_options: options
-      ).match
+      ).run
     end
   end
 end

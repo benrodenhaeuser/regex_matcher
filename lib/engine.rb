@@ -3,7 +3,7 @@ require_relative './automaton.rb'
 require_relative './line.rb'
 
 module Rex
-  class Matcher
+  class Engine
     DEFAULT_OPTIONS = {
       line_numbers:        true,
       global_matching:     true,
@@ -17,7 +17,7 @@ module Rex
       @opts         = DEFAULT_OPTIONS.merge(user_options)
     end
 
-    def match
+    def run
       file = File.open(@path)
       line_number = 1
 
