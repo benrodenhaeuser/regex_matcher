@@ -9,18 +9,58 @@ module Rex
       @matches = []
     end
 
-    def reset(index = @position)
-      @position = index
-      @from = @position
-      @to = nil
+    def find_matches(automaton, global)
+      setup(0) # intransparent naming
+
+      while cursor
+        match = find_match(automaton)
+
+        if match
+          @matches << match
+          break unless global
+        end
+
+        setup([@from + 1, @to].compact.max)
+        automaton.reset
+      end
     end
 
-    def length
-      @text.length
+    def find_match(automaton)
+      while automaton.step?(cursor)
+        automaton.step!(cursor)
+        consume
+        @to = @position if automaton.terminal?
+      end
+      @to ? [@from, @to] : nil
+    end
+
+    def found_match?
+      !@matches.empty?
+    end
+
+    def process_matches
+      @matches.reverse.each do |match|
+        process_match(match.first, match.last)
+      end
+    end
+
+    def prepend_line_number(line_count)
+      pad = format("%0#{line_count.length}d:  ", @line_number.to_s)
+      @text = pad + @text
+    end
+
+    def output
+      puts self
     end
 
     def to_s
       @text
+    end
+
+    private
+
+    def length
+      @text.length
     end
 
     def cursor
@@ -30,66 +70,6 @@ module Rex
     def consume
       @position += 1
     end
-
-    def [](index)
-      @text[index]
-    end
-
-    def match?
-      @from && @to
-    end
-
-    def match
-      [@from, @to]
-    end
-
-    def match!
-      @to = @position
-    end
-
-    def save_match
-      @matches << match
-    end
-
-    def prepend_line_number(line_count)
-      pad = format("%0#{line_count.length}d:  ", @line_number.to_s)
-      @text = pad + @text
-    end
-
-    def found_match?
-      !@matches.empty?
-    end
-
-    def output
-      puts self
-    end
-
-    def find_matches(automaton, global)
-      setup(0)
-
-      while cursor
-        @to = @position if automaton.terminal?
-        if automaton.step?(cursor)
-          automaton.step!(cursor)
-          consume
-        else
-          if @to
-            @matches << [@from, @to]
-            break unless global
-          end
-          setup([@from + 1, @to].compact.max)
-          automaton.reset
-        end
-      end
-    end
-
-    def process_matches
-      @matches.reverse.each do |match|
-        process_match(match.first, match.last)
-      end
-    end
-
-    private
 
     def setup(index)
       @position = index

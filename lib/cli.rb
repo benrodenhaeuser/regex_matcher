@@ -35,16 +35,16 @@ module Rex
 
     def self.parse_arguments
       {
-        pattern: ARGV.shift,
-        path: ARGV.shift,
+        pattern:      ARGV.shift,
+        path:         ARGV.shift,
         substitution: ARGV.shift
       }
     end
 
     def self.match(arguments, options)
       Matcher.new(
-        pattern: arguments[:pattern],
-        path: arguments[:path],
+        pattern:      arguments[:pattern],
+        path:         arguments[:path],
         substitution: arguments[:substitution],
         user_options: options
       ).match

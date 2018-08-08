@@ -23,12 +23,12 @@ module Rex
 
       until file.eof?
         @line = Line.new(
-          text:         file.gets,
+          text:         file.gets.chomp,
           line_number:  line_number,
           substitution: @substitution
         )
 
-        @line.find_matches(automaton, @opts[:global_matching])
+        @line.find_matches(automaton.reset, @opts[:global_matching])
         @line.process_matches if @line.found_match?
         @line.prepend_line_number(line_count) if @opts[:line_numbers]
         @line.output if @line.found_match? || @opts[:output_non_matching]
