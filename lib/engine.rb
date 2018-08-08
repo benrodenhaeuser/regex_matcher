@@ -7,10 +7,10 @@ require_relative './match.rb'
 module Rex
   class Engine
     DEFAULT_OPTIONS = {
-      line_numbers:       true,
-      global_matching:    true,
-      non_matching_lines: false,
-      only_matches:       false
+      line_numbers:           true,
+      global_matching:        true,
+      non_matching_lines:     false,
+      only_matching_segments: false
     }.freeze
 
     def initialize(pattern:, path:, substitution: nil, user_options: {})
@@ -18,7 +18,6 @@ module Rex
       @path         = path
       @substitution = substitution
       @opts         = DEFAULT_OPTIONS.merge(user_options)
-      
       @automaton    = Parser.new(@pattern).parse.to_automaton.to_dfa
     end
 

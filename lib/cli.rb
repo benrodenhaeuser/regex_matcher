@@ -33,8 +33,8 @@ module Rex
           options[:non_matching_lines] = true
         end
 
-        opts.on("--only-matches", "Output matching segments only") do
-          options[:only_matches] = true
+        opts.on("--only-matching_segments", "Output matching segments only") do
+          options[:only_matching_segments] = true
         end
       end
 
