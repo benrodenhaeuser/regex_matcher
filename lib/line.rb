@@ -2,7 +2,6 @@ module Rex
   class Line
     attr_accessor :text
     attr_accessor :position
-    attr_accessor :line_number
 
     def initialize(text)
       @text = text
