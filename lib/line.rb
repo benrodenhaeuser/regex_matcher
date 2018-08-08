@@ -10,7 +10,7 @@ module Rex
     end
 
     def find_matches(automaton, global)
-      setup(0) # intransparent naming
+      setup(0)
 
       while cursor
         match = find_match(automaton)
