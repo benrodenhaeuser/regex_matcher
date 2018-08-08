@@ -23,8 +23,12 @@ module Rex
           options[:global_matching] = false
         end
 
-        opts.on("--output-non-matching", "Output lines without matches") do |v|
-          options[:output_non_matching] = true
+        opts.on("--non-matching-lines", "Output lines without matches") do |v|
+          options[:non_matching_lines] = true
+        end
+
+        opts.on("--only-matches", "Output matching segments only") do |v|
+          options[:only_matches] = true
         end
       end
 
