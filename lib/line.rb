@@ -15,10 +15,6 @@ module Rex
     end
   end
 
-  # the Line class should be simpler: it's just a piece of text with a current index
-
-  # and we need another class that matches up lines and automaton
-
   class Line
     def initialize(text:, line_number:, substitution:)
       @text = text
@@ -59,7 +55,7 @@ module Rex
 
     def process_matches
       @matches.reverse.each do |match|
-        process_match(match.from, match.to)
+        process_match(match)
       end
     end
 
@@ -96,10 +92,10 @@ module Rex
       @to = nil
     end
 
-    def process_match(from, to)
-      pre       = @text[0...from]
-      the_match = @text[from...to]
-      post      = @text[to...length]
+    def process_match(match)
+      pre       = @text[0...match.from]
+      the_match = @text[match.from...match.to]
+      post      = @text[match.to...length]
       @text     = pre + replace(the_match) + post
     end
 
