@@ -3,10 +3,16 @@ require_relative './engine.rb'
 
 module Rex
   class CLI
-    def self.execute
-      options = parse_options
+    def self.run
+      options   = parse_options
       arguments = parse_arguments
-      run(arguments, options)
+
+      Engine.new(
+        pattern:      arguments[:pattern],
+        path:         arguments[:path],
+        substitution: arguments[:substitution],
+        user_options: options
+      ).run
     end
 
     def self.parse_options
@@ -15,19 +21,19 @@ module Rex
       option_parser = OptionParser.new do |opts|
         opts.banner = "Usage: rex [options] pattern path [substitution]"
 
-        opts.on("--no-line-numbers", "Disable line numbers") do |v|
+        opts.on("--no-line-numbers", "Disable line numbers") do
           options[:line_numbers] = false
         end
 
-        opts.on("--no-global-matching", "Disable global matching") do |v|
+        opts.on("--no-global-matching", "Disable global matching") do
           options[:global_matching] = false
         end
 
-        opts.on("--non-matching-lines", "Output lines without matches") do |v|
+        opts.on("--non-matching-lines", "Output lines without matches") do
           options[:non_matching_lines] = true
         end
 
-        opts.on("--only-matches", "Output matching segments only") do |v|
+        opts.on("--only-matches", "Output matching segments only") do
           options[:only_matches] = true
         end
       end
@@ -43,15 +49,6 @@ module Rex
         path:         ARGV.shift,
         substitution: ARGV.shift
       }
-    end
-
-    def self.run(arguments, options)
-      Engine.new(
-        pattern:      arguments[:pattern],
-        path:         arguments[:path],
-        substitution: arguments[:substitution],
-        user_options: options
-      ).run
     end
   end
 end

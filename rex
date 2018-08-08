@@ -2,4 +2,4 @@
 
 require_relative './lib/cli.rb'
 
-Rex::CLI.execute
+Rex::CLI.run

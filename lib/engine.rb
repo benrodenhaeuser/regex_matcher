@@ -70,7 +70,7 @@ module Rex
     end
 
     def process_matches
-      @matches.reverse.each do |match|
+      @matches.reverse_each do |match|
         process_match(match)
       end
     end
@@ -105,7 +105,7 @@ module Rex
     end
 
     def line_count
-      @line_count ||= %x{wc -l #{@path}}.split.first
+      @line_count ||= `wc -l #{@path}`.split.first
     end
 
     def output
