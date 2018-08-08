@@ -1,5 +1,4 @@
-require 'colorize'
-
+require_relative './string.rb'
 require_relative './parser.rb'
 require_relative './automaton.rb'
 require_relative './line.rb'
@@ -82,9 +81,9 @@ module Rex
 
     def replace(the_match)
       if tty? && @substitution
-        @substitution.colorize(:light_green).underline
+        @substitution.red.underline
       elsif tty?
-        the_match.colorize(:light_green).underline
+        the_match.red.underline
       elsif @substitution
         @substitution
       else
