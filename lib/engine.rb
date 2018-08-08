@@ -44,10 +44,10 @@ module Rex
     private
 
     def find_matches
-      @match = Match.new(@line.position)
-      @automaton.reset
-
       while @line.cursor
+        @match = Match.new(@line.position)
+        @automaton.reset
+
         find_match
 
         if @match.found?
@@ -56,8 +56,6 @@ module Rex
         end
 
         @line.position = [@match.from + 1, @match.to].compact.max
-        @match = Match.new(@line.position)
-        @automaton.reset
       end
     end
 
