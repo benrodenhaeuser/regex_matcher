@@ -37,16 +37,27 @@ class EngineTest < Minitest::Test
     File.read(@out_path).chomp
   end
 
-  def output(pattern:, text:)
+  def output(pattern:, text:, opts: {})
     write_to_input_file(text)
-    engine(pattern).run
+    engine(pattern, opts).run
     read_from_output_file
   end
 
-  def test_with_string_pattern
+  def test_literal_with_several_matches
     expected = output(pattern: 'test', text: 'test abcd test abcd')
     assert_equal(expected, "test, test")
   end
+
+  def test_literal_with_several_matches_in_one_match_mode
+    user_option = { one_match_per_line: true }
+    expected = output(
+      pattern: 'test',
+      text: 'test abcd test abcd',
+      opts: user_option
+    )
+    assert_equal(expected, "test")
+  end
+
 
   def teardown
     File.delete(@in_path)

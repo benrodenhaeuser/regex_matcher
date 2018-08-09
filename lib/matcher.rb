@@ -51,7 +51,7 @@ module Rex
 
     def rewrite_line
       if @opts[:matching_segments_only]
-        @line.text = matched_segments
+        @line.text = matching_segments
       else
         @matches.reverse_each do |match|
           process_match(match)
@@ -59,7 +59,7 @@ module Rex
       end
     end
 
-    def matched_segments
+    def matching_segments
       @matches.map { |match| @line[match.from...match.to] }.join(", ")
     end
 
@@ -72,9 +72,9 @@ module Rex
     end
 
     def replace(the_match)
-      if tty? && @opts[:substitution]
+      if output_is_a_tty? && @opts[:substitution]
         @opts[:substitution].red.underline
-      elsif tty?
+      elsif output_is_a_tty?
         the_match.red.underline
       elsif @opts[:substitution]
         @opts[:substitution]
@@ -83,7 +83,7 @@ module Rex
       end
     end
 
-    def tty?
+    def output_is_a_tty?
       @output.isatty
     end
 
