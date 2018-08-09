@@ -9,20 +9,21 @@ module Rex
       line_numbers:           true,
       global_matching:        true,
       non_matching_lines:     false,
-      only_matching_segments: false
+      only_matching_segments: false,
+      substitution:           nil
     }.freeze
 
-    def initialize(pattern:, path:, substitution: nil, user_options: {})
-      @pattern      = pattern
-      @path         = path
-      @substitution = substitution
-      @opts         = DEFAULT_OPTIONS.merge(user_options)
+    def initialize(pattern:, in_path:, out_path: nil, user_options: {})
+      @pattern  = pattern
+      @in_path  = in_path
+      @out_path = out_path
+      @opts     = DEFAULT_OPTIONS.merge(user_options)
     end
 
     def run
       automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      file = File.open(@path)
-      matcher = Matcher.new(automaton, line_count, @opts)
+      file = File.open(@in_path)
+      matcher = Matcher.new(automaton, line_count, @out_path, @opts)
 
       until file.eof?
         matcher.match(file.gets.chomp)
@@ -34,7 +35,7 @@ module Rex
     private
 
     def line_count
-      @line_count ||= `wc -l #{@path}`.split.first
+      @line_count ||= `wc -l #{@in_path}`.split.first
     end
   end
 end

@@ -9,8 +9,8 @@ module Rex
 
       Engine.new(
         pattern:      arguments[:pattern],
-        path:         arguments[:path],
-        substitution: arguments[:substitution],
+        in_path:      arguments[:in_path],
+        out_path:     arguments[:out_path],
         user_options: options
       ).run
     end
@@ -19,7 +19,11 @@ module Rex
       options = {}
 
       option_parser = OptionParser.new do |opts|
-        opts.banner = "Usage: rex [options] pattern path [substitution]"
+        opts.banner = "Usage: rex [options] pattern input-path [output-path]"
+
+        opts.on("--substitution SUBSTITUTION", "-s SUBSTITUTION", "substitute matches with value") do |value|
+          options[:substitution] = value
+        end
 
         opts.on("--no-line-numbers", "-nln", "Disable line numbers") do
           options[:line_numbers] = false
@@ -45,9 +49,9 @@ module Rex
 
     def self.parse_arguments
       {
-        pattern:      ARGV.shift,
-        path:         ARGV.shift,
-        substitution: ARGV.shift
+        pattern:  ARGV.shift,
+        in_path:  ARGV.shift,
+        out_path: ARGV.shift
       }
     end
   end

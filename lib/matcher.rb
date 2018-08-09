@@ -3,10 +3,12 @@ require_relative './match.rb'
 
 module Rex
   class Matcher
-    def initialize(automaton, line_count, opts)
-      @automaton = automaton
-      @line_count = line_count
-      @opts = opts
+    def initialize(automaton, line_count, out_path, opts)
+      @automaton   = automaton
+      @line_count  = line_count
+      @opts        = opts
+
+      $stdout      = File.open(out_path, 'w') if out_path
       @line_number = 0
     end
 
@@ -70,12 +72,12 @@ module Rex
     end
 
     def replace(the_match)
-      if tty? && @substitution
-        @substitution.red.underline
+      if tty? && @opts[:substitution]
+        @opts[:substitution].red.underline
       elsif tty?
         the_match.red.underline
-      elsif @substitution
-        @substitution
+      elsif @opts[:substitution]
+        @opts[:substitution]
       else
         the_match
       end
