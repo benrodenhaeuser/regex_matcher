@@ -12,7 +12,8 @@ TEST_DEFAULTS = {
 
 class EngineTest < Minitest::Test
   def setup
-    @data_path = File.join(File.expand_path(File.dirname(__FILE__)), 'data')
+    path_to_current_dir = File.expand_path(File.dirname(__FILE__))
+    @data_path = File.join(path_to_current_dir, 'data')
     Dir.mkdir(@data_path)
 
     @in_path = File.join(@data_path, 'input.txt')

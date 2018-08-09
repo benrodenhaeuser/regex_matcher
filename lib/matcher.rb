@@ -60,7 +60,7 @@ module Rex
     end
 
     def matched_segments
-      @matches.map { |match| @line[match.from...match.to] }.join(" ")
+      @matches.map { |match| @line[match.from...match.to] }.join(", ")
     end
 
     def process_match(match)
