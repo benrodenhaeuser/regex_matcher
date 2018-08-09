@@ -21,19 +21,19 @@ module Rex
       option_parser = OptionParser.new do |opts|
         opts.banner = "Usage: rex [options] pattern path [substitution]"
 
-        opts.on("--no-line-numbers", "Disable line numbers") do
+        opts.on("--no-line-numbers", "-nln", "Disable line numbers") do
           options[:line_numbers] = false
         end
 
-        opts.on("--no-global-matching", "Disable global matching") do
+        opts.on("--no-global-matching", "-ngm", "Disable global matching") do
           options[:global_matching] = false
         end
 
-        opts.on("--non-matching-lines", "Output lines without matches") do
+        opts.on("--non-matching-lines", "-nml", "Output lines w/o matches") do
           options[:non_matching_lines] = true
         end
 
-        opts.on("--only-matching_segments", "Output matching segments only") do
+        opts.on("--only-matching_segments", "-ms", "Output matching segments only") do
           options[:only_matching_segments] = true
         end
       end
