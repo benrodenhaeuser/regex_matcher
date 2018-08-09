@@ -44,12 +44,12 @@ class EngineTest < Minitest::Test
 
   def test_with_string_pattern
     expected = output(pattern: 'test', text: 'test abcd test abcd')
-    assert_equal(expected, "test test")
+    assert_equal(expected, "test, test")
   end
 
   def teardown
-    # File.delete(@in_path)
-    # File.delete(@out_path)
-    # Dir.delete(@data_path)
+    File.delete(@in_path)
+    File.delete(@out_path)
+    Dir.delete(@data_path)
   end
 end
