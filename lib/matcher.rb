@@ -94,7 +94,7 @@ module Rex
     end
 
     def output_line
-      return unless !@matches.empty? || @opts[:all_lines]
+      return unless @matches.first || @opts[:all_lines]
       @output.puts @line
     end
   end
