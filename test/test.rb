@@ -24,7 +24,7 @@ class EngineTest < Minitest::Test
     @output = File.new(@out_path, 'w').close
   end
 
-  def engine(pattern:, opts: {})
+  def engine(pattern, opts = {})
     Rex::Engine.new(
       pattern:      pattern,
       in_path:      @in_path,
@@ -33,13 +33,23 @@ class EngineTest < Minitest::Test
     )
   end
 
-  def test_engine
-    # 1.) write text to input file
+  def write_to_input_file(text)
+    File.write(@in_path, text)
+  end
 
-    # 2.) run engine with pattern
-    engine(pattern: 'es').run
+  def read_from_output_file
+    File.read(@out_path)
+  end
 
-    # 3.) make assertions about output file
+  def output(pattern:, text:)
+    write_to_input_file(text)
+    engine(pattern).run
+    read_from_output_file
+  end
+
+  def test_with_string_pattern
+    expected = output(pattern: 'test', text: 'test abcd test abcd')
+    assert_equal(expected, "test test\n")
   end
 
   def teardown
