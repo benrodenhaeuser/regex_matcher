@@ -3,12 +3,11 @@ require_relative './match.rb'
 
 module Rex
   class Matcher
-    def initialize(automaton, line_count, out_path, opts)
+    def initialize(automaton:, line_count:, out_path: nil, opts: {})
       @automaton   = automaton
       @line_count  = line_count
+      @out         = out_path ? File.open(out_path, 'w') : $stdout
       @opts        = opts
-
-      $stdout      = File.open(out_path, 'w') if out_path
       @line_number = 0
     end
 
@@ -84,7 +83,7 @@ module Rex
     end
 
     def tty?
-      $stdout.isatty
+      @out.isatty
     end
 
     def prepend_line_number
@@ -95,7 +94,7 @@ module Rex
 
     def output_line
       return unless !@matches.empty? || @opts[:non_matching_lines]
-      puts @line
+      @out.puts @line
     end
   end
 end

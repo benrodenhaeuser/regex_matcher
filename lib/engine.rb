@@ -23,7 +23,13 @@ module Rex
     def run
       automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
       file = File.open(@in_path)
-      matcher = Matcher.new(automaton, line_count, @out_path, @opts)
+
+      matcher = Matcher.new(
+        automaton: automaton,
+        line_count: line_count,
+        out_path: @out_path,
+        opts: @opts
+      )
 
       until file.eof?
         matcher.match(file.gets.chomp)
