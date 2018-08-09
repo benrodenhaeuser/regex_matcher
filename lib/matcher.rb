@@ -3,11 +3,11 @@ require_relative './match.rb'
 
 module Rex
   class Matcher
-    def initialize(automaton:, line_count:, out_path: nil, opts: {})
+    def initialize(automaton:, line_count:, opts: {}, output:)
       @automaton   = automaton
       @line_count  = line_count
-      @out         = out_path ? File.open(out_path, 'w') : $stdout
       @opts        = opts
+      @output      = output
       @line_number = 0
     end
 
@@ -34,7 +34,7 @@ module Rex
 
         if @match.found?
           @matches << @match
-          break unless @opts[:global_matching]
+          break if @opts[:one_match_per_line]
         end
 
         @line.position = [@match.from + 1, @match.to].compact.max
@@ -50,16 +50,17 @@ module Rex
     end
 
     def rewrite_line
-      if @opts[:only_matching_segments]
-        matched_segments = @matches.map do |match|
-          @line[match.from...match.to]
-        end
-        @line.text = matched_segments.join(" ")
+      if @opts[:matching_segments_only]
+        @line.text = matched_segments
       else
         @matches.reverse_each do |match|
           process_match(match)
         end
       end
+    end
+
+    def matched_segments
+      @matches.map { |match| @line[match.from...match.to] }.join(" ")
     end
 
     def process_match(match)
@@ -83,7 +84,7 @@ module Rex
     end
 
     def tty?
-      @out.isatty
+      @output.isatty
     end
 
     def prepend_line_number
@@ -93,8 +94,8 @@ module Rex
     end
 
     def output_line
-      return unless !@matches.empty? || @opts[:non_matching_lines]
-      @out.puts @line
+      return unless !@matches.empty? || @opts[:all_lines]
+      @output.puts @line
     end
   end
 end

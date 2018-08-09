@@ -25,20 +25,20 @@ module Rex
           options[:substitution] = value
         end
 
-        opts.on("--no-line-numbers", "-nln", "Disable line numbers") do
+        opts.on("--disable-line-numbers", "-d", "Disable line numbers") do
           options[:line_numbers] = false
         end
 
-        opts.on("--no-global-matching", "-ngm", "Disable global matching") do
-          options[:global_matching] = false
+        opts.on("--one-match", "-o", "One match per line") do
+          options[:one_match_per_line] = true
         end
 
-        opts.on("--non-matching-lines", "-nml", "Output lines w/o matches") do
-          options[:non_matching_lines] = true
+        opts.on("--all-lines", "-a", "Output all input lines") do
+          options[:all_lines] = true
         end
 
-        opts.on("--only-matching_segments", "-ms", "Output matching segments only") do
-          options[:only_matching_segments] = true
+        opts.on("--matching-segments-only", "-m", "Output matching segments only") do
+          options[:matching_segments_only] = true
         end
       end
 

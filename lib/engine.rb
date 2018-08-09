@@ -7,9 +7,9 @@ module Rex
   class Engine
     DEFAULT_OPTIONS = {
       line_numbers:           true,
-      global_matching:        true,
-      non_matching_lines:     false,
-      only_matching_segments: false,
+      one_match_per_line:     false,
+      all_lines:              false,
+      matching_segments_only: false,
       substitution:           nil
     }.freeze
 
@@ -22,20 +22,22 @@ module Rex
 
     def run
       automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      file = File.open(@in_path)
+      input = File.open(@in_path)
+      output = (@out_path ? File.open(@out_path, 'w') : $stdout.dup)
 
       matcher = Matcher.new(
-        automaton: automaton,
+        automaton:  automaton,
         line_count: line_count,
-        out_path: @out_path,
-        opts: @opts
+        output:     output,
+        opts:       @opts
       )
 
-      until file.eof?
-        matcher.match(file.gets.chomp)
+      until input.eof?
+        matcher.match(input.gets.chomp)
       end
 
-      file.close
+      input.close
+      output.close
     end
 
     private
