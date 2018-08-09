@@ -12,16 +12,11 @@ TEST_DEFAULTS = {
 
 class EngineTest < Minitest::Test
   def setup
-    @test_dir = File.expand_path(File.dirname(__FILE__))
-
-    @data_path = File.join(@test_dir, 'data')
+    @data_path = File.join(File.expand_path(File.dirname(__FILE__)), 'data')
     Dir.mkdir(@data_path)
 
     @in_path = File.join(@data_path, 'input.txt')
     @out_path = File.join(@data_path, 'output.txt')
-
-    @input = File.new(@in_path, 'w').close
-    @output = File.new(@out_path, 'w').close
   end
 
   def engine(pattern, opts = {})
@@ -38,7 +33,7 @@ class EngineTest < Minitest::Test
   end
 
   def read_from_output_file
-    File.read(@out_path)
+    File.read(@out_path).chomp
   end
 
   def output(pattern:, text:)
@@ -49,12 +44,12 @@ class EngineTest < Minitest::Test
 
   def test_with_string_pattern
     expected = output(pattern: 'test', text: 'test abcd test abcd')
-    assert_equal(expected, "test test\n")
+    assert_equal(expected, "test test")
   end
 
   def teardown
-    File.delete(@in_path)
-    File.delete(@out_path)
-    Dir.delete(@data_path)
+    # File.delete(@in_path)
+    # File.delete(@out_path)
+    # Dir.delete(@data_path)
   end
 end
