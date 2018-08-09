@@ -5,8 +5,8 @@ module Rex
   class Matcher
     def initialize(automaton, line_count, opts)
       @automaton = automaton
-      @opts = opts
       @line_count = line_count
+      @opts = opts
       @line_number = 0
     end
 
@@ -14,15 +14,15 @@ module Rex
       @line = Line.new(text)
       @line_number += 1
 
-      find_matches
-      process_matches
+      scan_line
+      rewrite_line
       prepend_line_number
-      output
+      output_line
     end
 
     private
 
-    def find_matches
+    def scan_line
       @matches = []
 
       while @line.cursor
@@ -48,9 +48,16 @@ module Rex
       end
     end
 
-    def process_matches
-      @matches.reverse_each do |match|
-        process_match(match)
+    def rewrite_line
+      if @opts[:only_matching_segments]
+        matched_segments = @matches.map do |match|
+          @line[match.from...match.to]
+        end
+        @line.text = matched_segments.join(" ")
+      else
+        @matches.reverse_each do |match|
+          process_match(match)
+        end
       end
     end
 
@@ -58,6 +65,7 @@ module Rex
       pre        = @line[0...match.from]
       the_match  = @line[match.from...match.to]
       post       = @line[match.to...@line.length]
+
       @line.text = pre + replace(the_match) + post
     end
 
@@ -83,7 +91,7 @@ module Rex
       @line.text = pad + @line.text
     end
 
-    def output
+    def output_line
       return unless !@matches.empty? || @opts[:non_matching_lines]
       puts @line
     end
