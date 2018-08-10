@@ -54,7 +54,7 @@ module Rex
         @line.text = matching_segments
       else
         @matches.reverse_each do |match|
-          process_match(match)
+          @line.text = process_match(match)
         end
       end
     end
@@ -68,10 +68,10 @@ module Rex
       the_match  = @line[match.from...match.to]
       post       = @line[match.to...@line.length]
 
-      @line.text = pre + replace(the_match) + post
+      pre + substitute(the_match) + post
     end
 
-    def replace(the_match)
+    def substitute(the_match)
       if output_is_a_tty? && @opts[:substitution]
         @opts[:substitution].red.underline
       elsif output_is_a_tty?
