@@ -89,7 +89,7 @@ module Rex
 
     def prepend_line_number
       return unless @opts[:line_numbers]
-      pad = format("%0#{@line_count.length}d:  ", @line_number.to_s)
+      pad = format("%0#{@line_count.length}d: ", @line_number.to_s)
       @line.text = pad + @line.text
     end
 
