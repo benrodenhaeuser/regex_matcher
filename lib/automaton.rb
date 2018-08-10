@@ -21,7 +21,7 @@ module Rex
         when Tokenizer::CONCAT
           ast.left.to_automaton.concat(ast.right.to_automaton)
         when Tokenizer::OPTION
-          ast.left.to_automaton.alternate(empty)
+          ast.left.to_automaton.alternate(empty_automaton)
         when Tokenizer::STAR
           ast.left.to_automaton.iterate
         end
@@ -51,13 +51,13 @@ module Rex
         )
       end
 
-      def empty
-        unique_state = State.new
+      def empty_automaton
+        state = State.new
         new(
-          initial: unique_state,
-          terminal: Set[unique_state],
+          initial: state,
+          terminal: Set[state],
           alphabet: Set.new,
-          states: Set[unique_state]
+          states: Set[state]
         )
       end
 
