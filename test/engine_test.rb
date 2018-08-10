@@ -29,21 +29,21 @@ class EngineTest < Minitest::Test
     @data_path = File.join(path_to_current_dir, 'data')
     Dir.mkdir(@data_path) unless Dir.exist?(@data_path)
 
-    @in_path = File.join(@data_path, 'input.txt')
+    @inp_path = File.join(@data_path, 'input.txt')
     @out_path = File.join(@data_path, 'output.txt')
   end
 
   def engine(pattern, opts = {})
     Rex::Engine.new(
       pattern:      pattern,
-      in_path:      @in_path,
+      inp_path:      @inp_path,
       out_path:     @out_path,
       user_options: TEST_DEFAULTS.merge(opts)
     )
   end
 
   def write_to_input_file(text)
-    File.write(@in_path, text)
+    File.write(@inp_path, text)
   end
 
   def read_from_output_file
@@ -143,7 +143,7 @@ class EngineTest < Minitest::Test
   end
 
   def teardown
-    File.delete(@in_path) if File.exist?(@in_path)
+    File.delete(@inp_path) if File.exist?(@inp_path)
     File.delete(@out_path) if File.exist?(@out_path)
     Dir.delete(@data_path)
   end
