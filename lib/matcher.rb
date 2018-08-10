@@ -63,7 +63,7 @@ module Rex
 
     def matching_segments
       segments = @matches.map { |match| @line[match.from...match.to] }
-      segments.reject { |segment| segment.empty? }.join(", ")
+      segments.reject(&:empty?).join(", ")
     end
 
     def process_match(match)

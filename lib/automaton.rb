@@ -27,6 +27,16 @@ module Rex
         end
       end
 
+      def empty_automaton
+        state = State.new
+        new(
+          initial: state,
+          terminal: Set[state],
+          alphabet: Set.new,
+          states: Set[state]
+        )
+      end
+
       def for_char(char)
         initial_state = State.new
         terminal_state = State.new
@@ -50,17 +60,6 @@ module Rex
           states:   Set[initial_state, terminal_state]
         )
       end
-
-      def empty_automaton
-        state = State.new
-        new(
-          initial: state,
-          terminal: Set[state],
-          alphabet: Set.new,
-          states: Set[state]
-        )
-      end
-
     end
 
     def alternate(other)

@@ -15,7 +15,7 @@ module Rex
 
     def match(expected_type)
       return consume if lookahead.type == expected_type
-      raise "Mismatch! Expected #{expected_type}, saw #{lookahead.type}"
+      raise RegexError, "Expected #{expected_type}, saw #{lookahead.type}"
     end
 
     def consume
@@ -28,7 +28,7 @@ module Rex
 
     def parse
       ast = expression
-      raise RegexError.new('Expected end of stream') unless eof?
+      raise(RegexError, 'Expected end of stream') unless eof?
       ast
     end
 
@@ -90,7 +90,7 @@ module Rex
         match(Tokenizer::RPAREN)
         ast
       else
-        raise RegexError.new("Invalid regular expression")
+        raise RegexError, "Invalid regular expression"
       end
     end
 

@@ -45,7 +45,7 @@ module Rex
 
     def pad_width
       return 3 unless @inp_path
-      @pad_with ||= `wc -l #{@inp_path}`.split.first.length
+      @pad_width ||= `wc -l #{@inp_path}`.split.first.length
     end
   end
 end
