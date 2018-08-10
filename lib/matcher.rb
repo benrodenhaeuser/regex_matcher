@@ -62,7 +62,8 @@ module Rex
     end
 
     def matching_segments
-      @matches.map { |match| @line[match.from...match.to] }.join(", ")
+      segments = @matches.map { |match| @line[match.from...match.to] }
+      segments.reject { |segment| segment.empty? }.join(", ")
     end
 
     def process_match(match)
