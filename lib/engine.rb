@@ -32,7 +32,8 @@ module Rex
         opts:       @opts
       )
 
-      until input.eof?
+      loop do
+        break if input.eof?
         matcher.match(input.gets.chomp)
       end
 
