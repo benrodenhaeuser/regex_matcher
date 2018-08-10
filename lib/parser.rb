@@ -25,17 +25,17 @@ module Rex
     end
 
     def parse
-      ast = regex
+      ast = expression
       raise 'Expected end of stream' unless eof?
       ast
     end
 
-    def regex
+    def expression
       left_ast = term
       if lookahead.type == Tokenizer::ALTERNATE
         token = lookahead
         match(Tokenizer::ALTERNATE)
-        right_ast = regex
+        right_ast = expression
       end
 
       return left_ast unless right_ast
@@ -75,7 +75,7 @@ module Rex
         atom
       elsif type == Tokenizer::LPAREN
         match(Tokenizer::LPAREN)
-        ast = regex
+        ast = expression
         match(Tokenizer::RPAREN)
         ast
       end
