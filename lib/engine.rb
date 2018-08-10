@@ -22,8 +22,8 @@ module Rex
 
     def run
       automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      input = File.open(@in_path)
-      output = (@out_path ? File.open(@out_path, 'w') : $stdout.dup)
+      input     = (@in_path ? File.open(@in_path) : $stdin.dup)
+      output    = (@out_path ? File.open(@out_path, 'w') : $stdout.dup)
 
       matcher = Matcher.new(
         automaton:  automaton,
@@ -43,7 +43,8 @@ module Rex
     private
 
     def line_count
-      @line_count ||= `wc -l #{@in_path}`.split.first
+      return 10 unless @in_path
+      @line_count ||= `wc -l #{@in_path}`.split.first.to_i
     end
   end
 end
