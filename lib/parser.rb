@@ -63,12 +63,6 @@ module Rex
       AST.new(root: token, left: ast)
     end
 
-    def atomic
-      token = lookahead
-      match(token.type)
-      AST.new(root: token)
-    end
-
     def base
       atomic_expressions = [
         Tokenizer::CHAR,
@@ -78,13 +72,19 @@ module Rex
       type = lookahead.type
 
       if atomic_expressions.include?(type)
-        atomic
+        atom
       elsif type == Tokenizer::LPAREN
         match(Tokenizer::LPAREN)
         ast = regex
         match(Tokenizer::RPAREN)
         ast
       end
+    end
+
+    def atom
+      token = lookahead
+      match(token.type)
+      AST.new(root: token)
     end
   end
 end
