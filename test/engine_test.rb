@@ -112,6 +112,46 @@ class EngineTest < Minitest::Test
     assert_equal(expected, actual)
   end
 
+  def test_option1
+    actual = output(
+      pattern: 'a?',
+      text: 'a'
+    )
+    expected = "a"
+
+    assert_equal(expected, actual)
+  end
+
+  def test_option2
+    actual = output(
+      pattern: 'a?',
+      text: 'b'
+    )
+    expected = ""
+
+    assert_equal(expected, actual)
+  end
+
+  def test_option3
+    actual = output(
+      pattern: 'colou?r',
+      text: 'colour'
+    )
+    expected = "colour"
+
+    assert_equal(expected, actual)
+  end
+
+  def test_option4
+    actual = output(
+      pattern: 'colou?r',
+      text: 'color'
+    )
+    expected = "color"
+
+    assert_equal(expected, actual)
+  end
+
   def test_dot
     actual = output(
       pattern: '.',
