@@ -10,11 +10,24 @@ TEST_DEFAULTS = {
   substitution:           nil
 }.freeze
 
+class ParserTest < Minitest::Test
+  def test_missing_subexpression_exception
+    parser = Rex::Parser.new("a|")
+
+    assert_raises(Rex::RegexError) { parser.parse }
+  end
+
+  def test_irregular_char_exception
+    parser = Rex::Parser.new("a)")
+    assert_raises(Rex::RegexError) { parser.parse }
+  end
+end
+
 class EngineTest < Minitest::Test
   def setup
     path_to_current_dir = File.expand_path(File.dirname(__FILE__))
     @data_path = File.join(path_to_current_dir, 'data')
-    Dir.mkdir(@data_path)
+    Dir.mkdir(@data_path) unless Dir.exist?(@data_path)
 
     @in_path = File.join(@data_path, 'input.txt')
     @out_path = File.join(@data_path, 'output.txt')
@@ -119,9 +132,19 @@ class EngineTest < Minitest::Test
     assert_equal(expected, actual)
   end
 
+  def test_slightly_more_complicated_regex
+    actual = output(
+      pattern: '(a|b)*(a|b)',
+      text: 'aaabbba'
+    )
+    expected = "aaabbba"
+
+    assert_equal(expected, actual)
+  end
+
   def teardown
-    File.delete(@in_path)
-    File.delete(@out_path)
+    File.delete(@in_path) if File.exist?(@in_path)
+    File.delete(@out_path) if File.exist?(@out_path)
     Dir.delete(@data_path)
   end
 end
