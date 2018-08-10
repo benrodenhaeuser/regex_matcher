@@ -60,10 +60,18 @@ module Rex
 
     def factor
       ast = base
-      return ast unless lookahead.type == Tokenizer::STAR
-      token = lookahead
-      match(Tokenizer::STAR)
-      AST.new(root: token, left: ast)
+      case lookahead.type
+      when Tokenizer::STAR
+        token = lookahead
+        match(Tokenizer::STAR)
+        AST.new(root: token, left: ast)
+      when Tokenizer::OPTION
+        token = lookahead
+        match(Tokenizer::OPTION)
+        AST.new(root: token, left: ast)
+      else
+        ast
+      end
     end
 
     def base

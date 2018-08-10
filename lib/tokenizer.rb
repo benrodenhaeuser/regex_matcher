@@ -12,8 +12,9 @@ module Rex
     CONCAT     = 4
     ALTERNATE  = 5
     STAR       = 6
-    LPAREN     = 7
-    RPAREN     = 8
+    OPTION     = 7
+    LPAREN     = 8
+    RPAREN     = 9
 
     BACKSLASH = ' \ '.strip
 
@@ -36,6 +37,8 @@ module Rex
           Token.new(RPAREN, @cursor)
         when '*'
           Token.new(STAR, @cursor)
+        when '?'
+          Token.new(OPTION, @cursor)
         when '|'
           Token.new(ALTERNATE, @cursor)
         when '.'

@@ -26,7 +26,8 @@ module Rex
     def scan_line
       @matches = []
 
-      while @line.cursor
+      loop do
+        break unless @line.cursor
         @match = Match.new(@line.position)
         @automaton.reset
 
@@ -42,10 +43,11 @@ module Rex
     end
 
     def find_match
-      while @automaton.step?(@line.cursor)
+      loop do
+        @match.to = @line.position if @automaton.terminal?
+        break unless @automaton.step?(@line.cursor)
         @automaton.step!(@line.cursor)
         @line.consume
-        @match.to = @line.position if @automaton.terminal?
       end
     end
 

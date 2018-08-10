@@ -13,7 +13,7 @@ module Rex
       substitution:           nil
     }.freeze
 
-    def initialize(pattern:, inp_path:, out_path: nil, user_options: {})
+    def initialize(pattern:, inp_path: nil, out_path: nil, user_options: {})
       @pattern  = pattern
       @inp_path = inp_path
       @out_path = out_path
