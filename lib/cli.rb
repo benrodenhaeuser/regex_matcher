@@ -9,7 +9,7 @@ module Rex
 
       Engine.new(
         pattern:      arguments[:pattern],
-        in_path:      arguments[:in_path],
+        inp_path:     arguments[:inp_path],
         out_path:     arguments[:out_path],
         user_options: options
       ).run
@@ -50,7 +50,7 @@ module Rex
     def self.parse_arguments
       {
         pattern:  ARGV.shift,
-        in_path:  ARGV.shift,
+        inp_path: ARGV.shift,
         out_path: ARGV.shift
       }
     end

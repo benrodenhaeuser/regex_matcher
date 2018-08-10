@@ -13,17 +13,17 @@ module Rex
       substitution:           nil
     }.freeze
 
-    def initialize(pattern:, in_path:, out_path: nil, user_options: {})
+    def initialize(pattern:, inp_path:, out_path: nil, user_options: {})
       @pattern  = pattern
-      @in_path  = in_path
+      @inp_path = inp_path
       @out_path = out_path
       @opts     = DEFAULT_OPTIONS.merge(user_options)
     end
 
     def run
       automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      input     = (@in_path ? File.open(@in_path) : $stdin.dup)
-      output    = (@out_path ? File.open(@out_path, 'w') : $stdout.dup)
+      input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
+      output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
       matcher = Matcher.new(
         automaton:  automaton,
@@ -43,8 +43,8 @@ module Rex
     private
 
     def line_count
-      return 10 unless @in_path
-      @line_count ||= `wc -l #{@in_path}`.split.first.to_i
+      return 10 unless @inp_path
+      @line_count ||= `wc -l #{@inp_path}`.split.first.to_i
     end
   end
 end
