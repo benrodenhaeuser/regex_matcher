@@ -3,9 +3,9 @@ require_relative './match.rb'
 
 module Rex
   class Matcher
-    def initialize(automaton:, line_count:, opts: {}, output:)
+    def initialize(automaton:, pad_width:, opts: {}, output:)
       @automaton   = automaton
-      @line_count  = line_count
+      @pad_width   = pad_width
       @opts        = opts
       @output      = output
       @line_number = 0
@@ -92,7 +92,7 @@ module Rex
 
     def prepend_line_number
       return unless @opts[:line_numbers]
-      pad = format("%0#{@line_count.to_s.length}d: ", @line_number.to_s)
+      pad = format("%0#{@pad_width}d: ", @line_number.to_s)
       @line.text = pad + @line.text
     end
 

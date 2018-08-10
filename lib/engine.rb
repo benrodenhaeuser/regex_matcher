@@ -26,10 +26,10 @@ module Rex
       output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
       matcher = Matcher.new(
-        automaton:  automaton,
-        line_count: line_count,
-        output:     output,
-        opts:       @opts
+        automaton: automaton,
+        output:    output,
+        pad_width: pad_width,
+        opts:      @opts
       )
 
       loop do
@@ -43,9 +43,9 @@ module Rex
 
     private
 
-    def line_count
-      return 10 unless @inp_path
-      @line_count ||= `wc -l #{@inp_path}`.split.first.to_i
+    def pad_width
+      return 3 unless @inp_path
+      @pad_with ||= `wc -l #{@inp_path}`.split.first.length
     end
   end
 end
