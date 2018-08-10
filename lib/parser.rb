@@ -3,6 +3,8 @@ require_relative './tokenizer.rb'
 require_relative './ast.rb'
 
 module Rex
+  class RegexError < RuntimeError; end
+
   class Parser
     attr_reader :lookahead
 
@@ -26,7 +28,7 @@ module Rex
 
     def parse
       ast = expression
-      raise 'Expected end of stream' unless eof?
+      raise RegexError.new('Expected end of stream') unless eof?
       ast
     end
 
@@ -43,13 +45,14 @@ module Rex
     end
 
     def term
+      ast = factor
+
       factor_first = [
         Tokenizer::CHAR,
         Tokenizer::DOT,
         Tokenizer::LPAREN
       ]
 
-      ast = factor
       return ast unless factor_first.include?(lookahead.type)
       token = Token.new(Tokenizer::CONCAT, '')
       AST.new(root: token, left: ast, right: term)
@@ -78,6 +81,8 @@ module Rex
         ast = expression
         match(Tokenizer::RPAREN)
         ast
+      else
+        raise RegexError.new("Invalid regular expression")
       end
     end
 
