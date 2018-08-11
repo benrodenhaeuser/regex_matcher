@@ -10,15 +10,44 @@ TEST_DEFAULTS = {
   substitution:           nil
 }.freeze
 
-class ParserTest < Minitest::Test
-  def test_missing_subexpression_exception
-    parser = Rex::Parser.new("a|")
+class TokenizerText < Minitest::Test
+  def test_escaped_star_is_tokenized_as_char
+    tokenizer = Rex::Tokenizer.new('\*')
+    actual = tokenizer.next_token.type
+    expected = Rex::Tokenizer::CHAR
+    assert_equal(expected, actual)
+  end
 
+  def test_end_of_input_is_tokenized_as_eof_token
+    tokenizer = Rex::Tokenizer.new('a')
+    tokenizer.next_token # process 'a'
+    actual = tokenizer.next_token.type
+    expected = Rex::Tokenizer::EOF_TYPE
+    assert_equal(expected, actual)
+
+    actual = tokenizer.next_token.type
+    assert_equal(expected, actual)
+  end
+end
+
+class ParserTest < Minitest::Test
+  def test_unbalanced_parentheses_raise_exception1
+    parser = Rex::Parser.new("(a|b|(c|d)")
     assert_raises(Rex::RegexError) { parser.parse }
   end
 
-  def test_irregular_char_exception
+  def test_unbalanced_parentheses_raise_exception2
     parser = Rex::Parser.new("a)")
+    assert_raises(Rex::RegexError) { parser.parse }
+  end
+
+  def test_empty_subexpression_raises_exception1
+    parser = Rex::Parser.new("a|")
+    assert_raises(Rex::RegexError) { parser.parse }
+  end
+
+  def test_empty_subexpression_raises_exception2
+    parser = Rex::Parser.new("(*)|ab")
     assert_raises(Rex::RegexError) { parser.parse }
   end
 end
@@ -36,18 +65,10 @@ class EngineTest < Minitest::Test
   def engine(pattern, opts = {})
     Rex::Engine.new(
       pattern:      pattern,
-      inp_path:      @inp_path,
+      inp_path:     @inp_path,
       out_path:     @out_path,
       user_options: TEST_DEFAULTS.merge(opts)
     )
-  end
-
-  def write_to_input_file(text)
-    File.write(@inp_path, text)
-  end
-
-  def read_from_output_file
-    File.read(@out_path).chomp
   end
 
   def output(pattern:, text:, opts: {})
@@ -56,12 +77,22 @@ class EngineTest < Minitest::Test
     read_from_output_file
   end
 
+  # write string we want to test against
+  def write_to_input_file(text)
+    File.write(@inp_path, text)
+  end
+
+  # read output produced by engine
+  def read_from_output_file
+    File.read(@out_path)
+  end
+
   def test_literal_concatenation
     actual = output(
       pattern: 'test',
       text: 'test abcd test abcd'
     )
-    expected = "test, test"
+    expected = "test, test\n"
 
     assert_equal(expected, actual)
   end
@@ -74,7 +105,7 @@ class EngineTest < Minitest::Test
       text: 'test abcd test abcd',
       opts: user_options
     )
-    expected = "test"
+    expected = "test\n"
 
     assert_equal(expected, actual)
   end
@@ -87,7 +118,7 @@ class EngineTest < Minitest::Test
       text: 'test abcd test abcd',
       opts: user_options
     )
-    expected = "1: test, test"
+    expected = "1: test, test\n"
 
     assert_equal(expected, actual)
   end
@@ -97,7 +128,7 @@ class EngineTest < Minitest::Test
       pattern: 'man|park',
       text: 'a man is walking in the park.'
     )
-    expected = "man, park"
+    expected = "man, park\n"
 
     assert_equal(expected, actual)
   end
@@ -107,7 +138,7 @@ class EngineTest < Minitest::Test
       pattern: '(a|b)*',
       text: 'aaabbbcccab'
     )
-    expected = "aaabbb, ab"
+    expected = "aaabbb, ab\n"
 
     assert_equal(expected, actual)
   end
@@ -117,7 +148,7 @@ class EngineTest < Minitest::Test
       pattern: 'a?',
       text: 'a'
     )
-    expected = "a"
+    expected = "a\n"
 
     assert_equal(expected, actual)
   end
@@ -127,7 +158,7 @@ class EngineTest < Minitest::Test
       pattern: 'a?',
       text: 'b'
     )
-    expected = ""
+    expected = "\n"
 
     assert_equal(expected, actual)
   end
@@ -137,7 +168,7 @@ class EngineTest < Minitest::Test
       pattern: 'colou?r',
       text: 'colour'
     )
-    expected = "colour"
+    expected = "colour\n"
 
     assert_equal(expected, actual)
   end
@@ -147,7 +178,7 @@ class EngineTest < Minitest::Test
       pattern: 'colou?r',
       text: 'color'
     )
-    expected = "color"
+    expected = "color\n"
 
     assert_equal(expected, actual)
   end
@@ -157,7 +188,7 @@ class EngineTest < Minitest::Test
       pattern: '.',
       text: 'aaabbb'
     )
-    expected = "a, a, a, b, b, b"
+    expected = "a, a, a, b, b, b\n"
 
     assert_equal(expected, actual)
   end
@@ -167,7 +198,7 @@ class EngineTest < Minitest::Test
       pattern: '.*',
       text: 'aaabbb'
     )
-    expected = "aaabbb"
+    expected = "aaabbb\n"
 
     assert_equal(expected, actual)
   end
@@ -177,8 +208,25 @@ class EngineTest < Minitest::Test
       pattern: '(a|b)*(a|b)',
       text: 'aaabbba'
     )
-    expected = "aaabbba"
+    expected = "aaabbba\n"
 
+    assert_equal(expected, actual)
+  end
+
+  def test_multiline_input
+    input = <<~HEREDOC
+      aaabb
+      bbbccc
+    HEREDOC
+    actual = output(
+      pattern: 'aaa|ccc',
+      text: input
+    )
+    expected = <<~HEREDOC
+      aaa
+      ccc
+    HEREDOC
+    expected = expected
     assert_equal(expected, actual)
   end
 
