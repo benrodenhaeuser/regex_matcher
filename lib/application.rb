@@ -18,24 +18,23 @@ module Rex
     end
 
     def run
-      input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
-      output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
+      @input    = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
+      @output   = @out_path ? File.open(@out_path, 'w') : $stdout.dup
+      @engine   = Engine.new(@pattern, !@opts[:one_match_per_line])
+      @reporter = Reporter.new(opts: @opts, output: @output)
 
-      engine = Engine.new(@pattern, !@opts[:one_match_per_line])
+      process_input
 
-      reporter = Reporter.new(
-        opts:      @opts,
-        output:    output
-      )
+      @input.close
+      @output.close
+    end
 
+    def process_input
       loop do
-        break if input.eof?
-        result = engine.run(input.gets.chomp)
-        reporter.report(result)
+        break if @input.eof?
+        result = @engine.run(@input.gets.chomp)
+        @reporter.report(result)
       end
-
-      input.close
-      output.close
     end
   end
 end
