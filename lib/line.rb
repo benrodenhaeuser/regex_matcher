@@ -13,18 +13,6 @@ module Rex
       @matches = []
     end
 
-    def [](index)
-      @text[index]
-    end
-
-    def to_s
-      @text
-    end
-
-    def length
-      @text.length
-    end
-
     def cursor
       @text[@position]
     end
@@ -38,39 +26,58 @@ module Rex
       @output = output
 
       write_report
-      prepend_line_number
       print_report
     end
 
     private
 
+    # TODO: this is a nightmare
+
+    # NOTE:
+    # - prepend_line_number does not work in the only_matches/with_line_numbers
+    #   case, because there we have several lines
+    # - proper_segments and proper_matches are terrible names
+    # - highlighting is something that is common to all cases, so we could
+    #   perhaps unify it somehow
+
     def write_report
       if @opts[:only_matches]
-        @report = matching_segments
+        @report =
+          if @opts[:line_numbers]
+            proper_matches = @matches.reject { |match| match.from == match.to }
+
+            (0...proper_segments.length).map do |index|
+              "#{@line_number}:#{proper_matches[index].from + 1}: #{proper_segments[index].highlight}"
+            end.join("\n")
+          else
+            proper_segments.map(&:highlight).join("\n")
+          end
       else
-        @report = @text
+        @report = @text + "\n"
         @matches.reverse_each do |match|
           @report = process_match(match)
         end
+        prepend_line_number
       end
     end
 
-    def matching_segments
-      segments = @matches.map { |match| self[match.from...match.to] }
-      segments.reject(&:empty?).join(", ")
+    def proper_segments
+      @matches.map do |match|
+        @text[match.from...match.to]
+      end.reject(&:empty?)
     end
 
     def process_match(match)
-      pre        = @report[0...match.from]
+      pre_match  = @report[0...match.from]
       the_match  = @report[match.from...match.to]
-      post       = @report[match.to...@report.length]
+      post_match = @report[match.to...@report.length]
 
-      pre + substitute(the_match) + post
+      pre_match + highlight(the_match) + post_match
     end
 
-    def substitute(the_match)
+    def highlight(the_match)
       return the_match unless output_is_a_tty?
-      the_match.red.underline
+      the_match.highlight
     end
 
     def output_is_a_tty?

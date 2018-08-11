@@ -24,7 +24,7 @@ module Rex
         @match = Match.new(@line.position)
         @automaton.reset
 
-        find_next_match
+        seek
 
         if @match.found?
           @line.matches << @match
@@ -35,7 +35,7 @@ module Rex
       end
     end
 
-    def find_next_match
+    def seek
       loop do
         @match.to = @line.position if @automaton.terminal?
         break unless @automaton.step?(@line.cursor)
