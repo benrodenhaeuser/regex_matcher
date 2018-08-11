@@ -1,5 +1,4 @@
 require_relative './engine.rb'
-require_relative './reporter.rb'
 
 module Rex
   class Application
@@ -18,23 +17,21 @@ module Rex
     end
 
     def run
-      @input    = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
-      @output   = @out_path ? File.open(@out_path, 'w') : $stdout.dup
-      @engine   = Engine.new(@pattern, !@opts[:one_match_per_line])
-      @reporter = Reporter.new(opts: @opts, output: @output)
+      input  = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
+      output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
+      engine = Engine.new(@pattern, !@opts[:one_match_per_line])
 
-      process_input
+      loop do
+        break if input.eof?
+        engine.run(input.gets.chomp).report(@opts, output)
+      end
 
-      @input.close
-      @output.close
+      input.close
+      output.close
     end
 
     def process_input
-      loop do
-        break if @input.eof?
-        result = @engine.run(@input.gets.chomp)
-        @reporter.report(result)
-      end
+
     end
   end
 end

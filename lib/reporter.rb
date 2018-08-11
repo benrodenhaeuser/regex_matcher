@@ -2,17 +2,15 @@ require_relative './string.rb'
 
 module Rex
   class Reporter
-    def initialize(opts:, output:)
-      @opts = opts
-      @output = output
-      @line_number = 0
+    def initialize(line, line_number, matches)
+      @line        = line
+      @line_number = line_number
+      @matches     = matches
     end
 
-    def report(result)
-      @line = result[:line]
-      @matches = result[:matches]
-      @line_number += 1
-
+    def report(opts, output)
+      @opts = opts
+      @output = output
       rewrite_line
       prepend_line_number
       output_line

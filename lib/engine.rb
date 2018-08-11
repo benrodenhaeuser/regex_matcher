@@ -1,23 +1,23 @@
 require_relative './parser.rb'
 require_relative './line.rb'
 require_relative './match.rb'
+require_relative './reporter.rb'
 
 module Rex
   class Engine
     def initialize(pattern, global)
-      @automaton = Parser.new(pattern).parse.to_automaton.to_dfa
-      @global    = global
+      @automaton   = Parser.new(pattern).parse.to_automaton.to_dfa
+      @global      = global
+      @line_number = 0
     end
 
     def run(text)
       @line = Line.new(text)
+      @line_number += 1
 
       match
 
-      {
-        line:    @line,
-        matches: @matches
-      }
+      Reporter.new(@line, @line_number, @matches)
     end
 
     private
