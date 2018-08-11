@@ -3,11 +3,10 @@ require 'minitest/autorun'
 require_relative '../lib/application.rb'
 
 TEST_DEFAULTS = {
-  line_numbers:           false,
-  one_match_per_line:     false,
-  all_lines:              false,
-  matching_segments_only: true,
-  substitution:           nil
+  line_numbers: false,
+  global:       true,
+  all_lines:    false,
+  only_matches: true
 }.freeze
 
 class TokenizerText < Minitest::Test
@@ -98,7 +97,7 @@ class AppTest < Minitest::Test
   end
 
   def test_one_match_mode
-    user_options = { one_match_per_line: true }
+    user_options = { global: false }
 
     actual = output(
       pattern: 'test',

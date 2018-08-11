@@ -45,7 +45,7 @@ module Rex
     private
 
     def rewrite_line
-      if @opts[:matching_segments_only]
+      if @opts[:only_matches]
         @text = matching_segments
       else
         @matches.reverse_each do |match|

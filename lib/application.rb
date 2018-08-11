@@ -3,10 +3,10 @@ require_relative './engine.rb'
 module Rex
   class Application
     DEFAULT_OPTIONS = {
-      line_numbers:           true,
-      one_match_per_line:     false,
-      all_lines:              false,
-      matching_segments_only: false
+      line_numbers: true,
+      global:       true,
+      all_lines:    false,
+      only_matches: false
     }.freeze
 
     def initialize(pattern:, inp_path: nil, out_path: nil, user_options: {})
@@ -29,7 +29,7 @@ module Rex
     end
 
     def engine
-      @engine ||= Engine.new(@pattern, !@opts[:one_match_per_line])
+      @engine ||= Engine.new(@pattern, @opts[:global])
     end
   end
 end

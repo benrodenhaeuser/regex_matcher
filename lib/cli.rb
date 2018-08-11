@@ -26,7 +26,7 @@ module Rex
         end
 
         opts.on("--one-match", "-o", "One match per line") do
-          options[:one_match_per_line] = true
+          options[:global] = false
         end
 
         opts.on("--all-lines", "-a", "Output all input lines") do
@@ -34,7 +34,7 @@ module Rex
         end
 
         opts.on("--matching-segments-only", "-m", "Output matching segments only") do
-          options[:matching_segments_only] = true
+          options[:only_matches] = true
         end
       end
 
