@@ -1,12 +1,12 @@
 require_relative './state.rb'
 require_relative './set.rb'
-require_relative './from_ast.rb'
-require_relative './to_dfa.rb'
+require_relative './thompson.rb'
+require_relative './dfa.rb'
 
 module Rex
   class Automaton
-    include FromAST
-    include ToDFA
+    include Thompson
+    include DFA
 
     attr_accessor :initial
     attr_accessor :terminal

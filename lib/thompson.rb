@@ -1,5 +1,5 @@
 module Rex
-  module FromAST
+  module Thompson
     SILENT = ''
 
     def self.included(base)

@@ -1,5 +1,5 @@
 module Rex
-  module ToDFA
+  module DFA
     def to_dfa
       dfa_initial = State.new(data: epsilon_closure(Set[initial]))
       dfa_terminal = Set.new
