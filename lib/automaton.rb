@@ -13,9 +13,9 @@ module Rex
       def from_ast(ast)
         case ast.root.type
         when Tokenizer::CHAR
-          Automaton.for_char(ast.root.text)
+          char_automaton(ast.root.text)
         when Tokenizer::DOT
-          Automaton.for_dot
+          dot_automaton
         when Tokenizer::ALTERNATE
           ast.left.to_automaton.alternate(ast.right.to_automaton)
         when Tokenizer::CONCAT
@@ -37,7 +37,7 @@ module Rex
         )
       end
 
-      def for_char(char)
+      def char_automaton(char)
         initial_state = State.new
         terminal_state = State.new
         initial_state.moves[char] = Set[terminal_state]
@@ -49,7 +49,7 @@ module Rex
         )
       end
 
-      def for_dot
+      def dot_automaton
         initial_state = State.new
         terminal_state = State.new
         ALPHABET.each { |char| initial_state.moves[char] = Set[terminal_state] }
