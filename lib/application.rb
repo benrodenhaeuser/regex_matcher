@@ -19,7 +19,6 @@ module Rex
     def run
       input  = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
       output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
-      engine = Engine.new(@pattern, !@opts[:one_match_per_line])
 
       until input.eof?
         engine.match(input.gets.chomp).report(@opts, output)
@@ -27,6 +26,10 @@ module Rex
 
       input.close
       output.close
+    end
+
+    def engine
+      @engine ||= Engine.new(@pattern, !@opts[:one_match_per_line])
     end
   end
 end
