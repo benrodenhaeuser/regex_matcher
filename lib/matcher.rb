@@ -3,22 +3,15 @@ require_relative './match.rb'
 
 module Rex
   class Matcher
-    def initialize(automaton:, pad_width:, opts: {}, output:)
-      @automaton   = automaton
-      @pad_width   = pad_width
-      @opts        = opts
-      @output      = output
-      @line_number = 0
+    def initialize(automaton, local)
+      @automaton = automaton
+      @global = !local
     end
 
     def match(text)
       @line = Line.new(text)
-      @line_number += 1
-
       scan_line
-      rewrite_line
-      prepend_line_number
-      output_line
+      { line: @line, matches: @matches }
     end
 
     private
@@ -35,7 +28,7 @@ module Rex
 
         if @match.found?
           @matches << @match
-          break if @opts[:one_match_per_line]
+          break unless @global
         end
 
         @line.position = [@match.from + 1, @match.to].compact.max
@@ -49,49 +42,6 @@ module Rex
         @automaton.step!(@line.cursor)
         @line.consume
       end
-    end
-
-    def rewrite_line
-      if @opts[:matching_segments_only]
-        @line.text = matching_segments
-      else
-        @matches.reverse_each do |match|
-          @line.text = process_match(match)
-        end
-      end
-    end
-
-    def matching_segments
-      segments = @matches.map { |match| @line[match.from...match.to] }
-      segments.reject(&:empty?).join(", ")
-    end
-
-    def process_match(match)
-      pre        = @line[0...match.from]
-      the_match  = @line[match.from...match.to]
-      post       = @line[match.to...@line.length]
-
-      pre + substitute(the_match) + post
-    end
-
-    def substitute(the_match)
-      return the_match unless output_is_a_tty?
-      @opts.red.underline
-    end
-
-    def output_is_a_tty?
-      @output.isatty
-    end
-
-    def prepend_line_number
-      return unless @opts[:line_numbers]
-      pad = format("%0#{@pad_width}d: ", @line_number.to_s)
-      @line.text = pad + @line.text
-    end
-
-    def output_line
-      return unless @matches.first || @opts[:all_lines]
-      @output.puts @line
     end
   end
 end

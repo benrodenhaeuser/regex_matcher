@@ -1,7 +1,7 @@
-require_relative './string.rb'
 require_relative './parser.rb'
 require_relative './automaton.rb'
 require_relative './matcher.rb'
+require_relative './reporter.rb'
 
 module Rex
   class Engine
@@ -24,16 +24,18 @@ module Rex
       input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
       output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
-      matcher = Matcher.new(
-        automaton: automaton,
-        output:    output,
+      matcher = Matcher.new(automaton, @opts[:one_match_per_line])
+
+      reporter = Reporter.new(
         pad_width: pad_width,
-        opts:      @opts
+        opts:      @opts,
+        output:    output
       )
 
       loop do
         break if input.eof?
-        matcher.match(input.gets.chomp)
+        result = matcher.match(input.gets.chomp)
+        reporter.report(result)
       end
 
       input.close
@@ -43,7 +45,7 @@ module Rex
     private
 
     def pad_width
-      return 3 unless @inp_path
+      return 1 unless @inp_path
       @pad_width ||= `wc -l #{@inp_path}`.split.first.length
     end
   end
