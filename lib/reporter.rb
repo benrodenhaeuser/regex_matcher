@@ -2,8 +2,7 @@ require_relative './string.rb'
 
 module Rex
   class Reporter
-    def initialize(pad_width:, opts:, output:)
-      @pad_width = pad_width
+    def initialize(opts:, output:)
       @opts = opts
       @output = output
       @line_number = 0
@@ -53,8 +52,7 @@ module Rex
 
     def prepend_line_number
       return unless @opts[:line_numbers]
-      pad = format("%0#{@pad_width}d: ", @line_number.to_s)
-      @line.text = pad + @line.text
+      @line.text = @line_number.to_s + ": " + @line.text
     end
 
     def output_line

@@ -24,7 +24,6 @@ module Rex
       engine = Engine.new(@pattern, !@opts[:one_match_per_line])
 
       reporter = Reporter.new(
-        pad_width: pad_width,
         opts:      @opts,
         output:    output
       )
@@ -37,13 +36,6 @@ module Rex
 
       input.close
       output.close
-    end
-
-    private
-
-    def pad_width
-      return 1 unless @inp_path
-      @pad_width ||= `wc -l #{@inp_path}`.split.first.length
     end
   end
 end
