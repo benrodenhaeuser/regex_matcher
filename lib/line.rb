@@ -37,19 +37,20 @@ module Rex
       @opts = opts
       @output = output
 
-      rewrite_line
+      write_report
       prepend_line_number
-      output_line
+      print_report
     end
 
     private
 
-    def rewrite_line
+    def write_report
       if @opts[:only_matches]
-        @text = matching_segments
+        @report = matching_segments
       else
+        @report = @text
         @matches.reverse_each do |match|
-          @text = process_match(match)
+          @report = process_match(match)
         end
       end
     end
@@ -60,9 +61,9 @@ module Rex
     end
 
     def process_match(match)
-      pre        = self[0...match.from]
-      the_match  = self[match.from...match.to]
-      post       = self[match.to...length]
+      pre        = @report[0...match.from]
+      the_match  = @report[match.from...match.to]
+      post       = @report[match.to...@report.length]
 
       pre + substitute(the_match) + post
     end
@@ -78,12 +79,12 @@ module Rex
 
     def prepend_line_number
       return unless @opts[:line_numbers]
-      @text = @line_number.to_s + ": " + @text
+      @report = @line_number.to_s + ": " + @report
     end
 
-    def output_line
+    def print_report
       return unless @matches.first || @opts[:all_lines]
-      @output.puts self
+      @output.puts @report
     end
   end
 end
