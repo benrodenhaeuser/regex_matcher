@@ -1,7 +1,6 @@
 require_relative './parser.rb'
 require_relative './line.rb'
 require_relative './match.rb'
-require_relative './match_result.rb'
 
 module Rex
   class Engine
@@ -12,19 +11,14 @@ module Rex
     end
 
     def match(text)
-      @line = Line.new(text)
-      @line_number += 1
-
-      match_line
-
-      MatchResult.new(@line, @line_number, @matches)
+      @line = Line.new(text, @line_number += 1)
+      find_matches
+      @line
     end
 
     private
 
-    def match_line
-      @matches = []
-
+    def find_matches
       loop do
         break unless @line.cursor
         @match = Match.new(@line.position)
@@ -33,7 +27,7 @@ module Rex
         find_next_match
 
         if @match.found?
-          @matches << @match
+          @line.matches << @match
           break unless @global
         end
 
