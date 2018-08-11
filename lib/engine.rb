@@ -1,11 +1,12 @@
+require_relative './parser.rb'
 require_relative './line.rb'
 require_relative './match.rb'
 
 module Rex
   class Engine
-    def initialize(automaton, local)
-      @automaton = automaton
-      @global = !local
+    def initialize(pattern, local)
+      @automaton = Parser.new(pattern).parse.to_automaton.to_dfa
+      @global    = !local
     end
 
     def match(text)

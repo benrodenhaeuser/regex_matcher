@@ -1,3 +1,5 @@
+require_relative './automaton.rb'
+
 module Rex
   class AST
     attr_accessor :root

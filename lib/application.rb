@@ -1,5 +1,3 @@
-require_relative './parser.rb'
-require_relative './automaton.rb'
 require_relative './engine.rb'
 require_relative './reporter.rb'
 
@@ -20,11 +18,10 @@ module Rex
     end
 
     def run
-      automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
       input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
       output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
-      engine = Engine.new(automaton, @opts[:one_match_per_line])
+      engine = Engine.new(@pattern, @opts[:one_match_per_line])
 
       reporter = Reporter.new(
         pad_width: pad_width,
@@ -34,7 +31,8 @@ module Rex
 
       loop do
         break if input.eof?
-        reporter.report(engine.match(input.gets.chomp))
+        result = engine.match(input.gets.chomp)
+        reporter.report(result)
       end
 
       input.close
