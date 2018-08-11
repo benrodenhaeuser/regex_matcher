@@ -1,52 +1,47 @@
-require_relative './parser.rb'
-require_relative './automaton.rb'
-require_relative './matcher.rb'
-require_relative './reporter.rb'
+require_relative './line.rb'
+require_relative './match.rb'
 
 module Rex
   class Engine
-    DEFAULT_OPTIONS = {
-      line_numbers:           true,
-      one_match_per_line:     false,
-      all_lines:              false,
-      matching_segments_only: false
-    }.freeze
-
-    def initialize(pattern:, inp_path: nil, out_path: nil, user_options: {})
-      @pattern  = pattern
-      @inp_path = inp_path
-      @out_path = out_path
-      @opts     = DEFAULT_OPTIONS.merge(user_options)
+    def initialize(automaton, local)
+      @automaton = automaton
+      @global = !local
     end
 
-    def run
-      automaton = Parser.new(@pattern).parse.to_automaton.to_dfa
-      input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
-      output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
-
-      matcher = Matcher.new(automaton, @opts[:one_match_per_line])
-
-      reporter = Reporter.new(
-        pad_width: pad_width,
-        opts:      @opts,
-        output:    output
-      )
-
-      loop do
-        break if input.eof?
-        result = matcher.match(input.gets.chomp)
-        reporter.report(result)
-      end
-
-      input.close
-      output.close
+    def match(text)
+      @line = Line.new(text)
+      scan_line
+      { line: @line, matches: @matches }
     end
 
     private
 
-    def pad_width
-      return 1 unless @inp_path
-      @pad_width ||= `wc -l #{@inp_path}`.split.first.length
+    def scan_line
+      @matches = []
+
+      loop do
+        break unless @line.cursor
+        @match = Match.new(@line.position)
+        @automaton.reset
+
+        find_match
+
+        if @match.found?
+          @matches << @match
+          break unless @global
+        end
+
+        @line.position = [@match.from + 1, @match.to].compact.max
+      end
+    end
+
+    def find_match
+      loop do
+        @match.to = @line.position if @automaton.terminal?
+        break unless @automaton.step?(@line.cursor)
+        @automaton.step!(@line.cursor)
+        @line.consume
+      end
     end
   end
 end

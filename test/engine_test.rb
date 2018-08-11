@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 
-require_relative '../lib/engine.rb'
+require_relative '../lib/application.rb'
 
 TEST_DEFAULTS = {
   line_numbers:           false,
@@ -62,8 +62,8 @@ class EngineTest < Minitest::Test
     @out_path = File.join(@data_path, 'output.txt')
   end
 
-  def engine(pattern, opts = {})
-    Rex::Engine.new(
+  def app(pattern, opts = {})
+    Rex::Application.new(
       pattern:      pattern,
       inp_path:     @inp_path,
       out_path:     @out_path,
@@ -73,7 +73,7 @@ class EngineTest < Minitest::Test
 
   def output(pattern:, text:, opts: {})
     write_to_input_file(text)
-    engine(pattern, opts).run
+    app(pattern, opts).run
     read_from_output_file
   end
 

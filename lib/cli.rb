@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative './engine.rb'
+require_relative './application.rb'
 
 module Rex
   class CLI
@@ -7,7 +7,7 @@ module Rex
       options   = parse_options
       arguments = parse_arguments
 
-      Engine.new(
+      Application.new(
         pattern:      arguments[:pattern],
         inp_path:     arguments[:inp_path],
         out_path:     arguments[:out_path],
