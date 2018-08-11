@@ -1,7 +1,7 @@
 require_relative './string.rb'
 
 module Rex
-  class Reporter
+  class MatchResult
     def initialize(line, line_number, matches)
       @line        = line
       @line_number = line_number

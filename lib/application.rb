@@ -21,8 +21,7 @@ module Rex
       output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
       engine = Engine.new(@pattern, !@opts[:one_match_per_line])
 
-      loop do
-        break if input.eof?
+      until input.eof?
         engine.match(input.gets.chomp).report(@opts, output)
       end
 

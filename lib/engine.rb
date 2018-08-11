@@ -1,7 +1,7 @@
 require_relative './parser.rb'
 require_relative './line.rb'
 require_relative './match.rb'
-require_relative './reporter.rb'
+require_relative './match_result.rb'
 
 module Rex
   class Engine
@@ -17,7 +17,7 @@ module Rex
 
       match_line
 
-      Reporter.new(@line, @line_number, @matches)
+      MatchResult.new(@line, @line_number, @matches)
     end
 
     private
