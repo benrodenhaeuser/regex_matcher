@@ -9,8 +9,7 @@ module Rex
       line_numbers:           true,
       one_match_per_line:     false,
       all_lines:              false,
-      matching_segments_only: false,
-      substitution:           nil
+      matching_segments_only: false
     }.freeze
 
     def initialize(pattern:, inp_path: nil, out_path: nil, user_options: {})

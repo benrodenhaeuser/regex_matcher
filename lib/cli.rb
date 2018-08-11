@@ -21,10 +21,6 @@ module Rex
       option_parser = OptionParser.new do |opts|
         opts.banner = "Usage: rex [options] pattern input-path [output-path]"
 
-        opts.on("--substitution SUBSTITUTION", "-s SUBSTITUTION", "substitute matches with value") do |value|
-          options[:substitution] = value
-        end
-
         opts.on("--disable-line-numbers", "-d", "Disable line numbers") do
           options[:line_numbers] = false
         end

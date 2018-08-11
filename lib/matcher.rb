@@ -75,15 +75,8 @@ module Rex
     end
 
     def substitute(the_match)
-      if output_is_a_tty? && @opts[:substitution]
-        @opts[:substitution].red.underline
-      elsif output_is_a_tty?
-        the_match.red.underline
-      elsif @opts[:substitution]
-        @opts[:substitution]
-      else
-        the_match
-      end
+      return the_match unless output_is_a_tty?
+      @opts.red.underline
     end
 
     def output_is_a_tty?
