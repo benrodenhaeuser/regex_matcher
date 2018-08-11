@@ -23,7 +23,7 @@ module Rex
 
       loop do
         break if input.eof?
-        engine.run(input.gets.chomp).report(@opts, output)
+        engine.match(input.gets.chomp).report(@opts, output)
       end
 
       input.close

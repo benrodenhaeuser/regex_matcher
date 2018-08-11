@@ -11,18 +11,18 @@ module Rex
       @line_number = 0
     end
 
-    def run(text)
+    def match(text)
       @line = Line.new(text)
       @line_number += 1
 
-      match
+      match_line
 
       Reporter.new(@line, @line_number, @matches)
     end
 
     private
 
-    def match
+    def match_line
       @matches = []
 
       loop do
@@ -30,7 +30,7 @@ module Rex
         @match = Match.new(@line.position)
         @automaton.reset
 
-        find_single_match
+        find_next_match
 
         if @match.found?
           @matches << @match
@@ -41,7 +41,7 @@ module Rex
       end
     end
 
-    def find_single_match
+    def find_next_match
       loop do
         @match.to = @line.position if @automaton.terminal?
         break unless @automaton.step?(@line.cursor)
