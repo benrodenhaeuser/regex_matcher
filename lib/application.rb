@@ -28,9 +28,5 @@ module Rex
       input.close
       output.close
     end
-
-    def process_input
-
-    end
   end
 end
