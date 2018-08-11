@@ -21,7 +21,7 @@ module Rex
       input     = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
       output    = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
-      engine = Engine.new(@pattern, @opts[:one_match_per_line])
+      engine = Engine.new(@pattern, !@opts[:one_match_per_line])
 
       reporter = Reporter.new(
         pad_width: pad_width,
@@ -31,7 +31,7 @@ module Rex
 
       loop do
         break if input.eof?
-        result = engine.match(input.gets.chomp)
+        result = engine.run(input.gets.chomp)
         reporter.report(result)
       end
 

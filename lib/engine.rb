@@ -4,20 +4,25 @@ require_relative './match.rb'
 
 module Rex
   class Engine
-    def initialize(pattern, local)
+    def initialize(pattern, global)
       @automaton = Parser.new(pattern).parse.to_automaton.to_dfa
-      @global    = !local
+      @global    = global
     end
 
-    def match(text)
+    def run(text)
       @line = Line.new(text)
-      scan_line
-      { line: @line, matches: @matches }
+
+      match
+
+      {
+        line:    @line,
+        matches: @matches
+      }
     end
 
     private
 
-    def scan_line
+    def match
       @matches = []
 
       loop do
@@ -25,7 +30,7 @@ module Rex
         @match = Match.new(@line.position)
         @automaton.reset
 
-        find_match
+        find_single_match
 
         if @match.found?
           @matches << @match
@@ -36,7 +41,7 @@ module Rex
       end
     end
 
-    def find_match
+    def find_single_match
       loop do
         @match.to = @line.position if @automaton.terminal?
         break unless @automaton.step?(@line.cursor)

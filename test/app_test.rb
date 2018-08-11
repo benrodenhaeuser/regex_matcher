@@ -52,7 +52,7 @@ class ParserTest < Minitest::Test
   end
 end
 
-class EngineTest < Minitest::Test
+class AppTest < Minitest::Test
   def setup
     path_to_current_dir = File.expand_path(File.dirname(__FILE__))
     @data_path = File.join(path_to_current_dir, 'data')
