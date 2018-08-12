@@ -28,27 +28,35 @@ module Rex
 
     def only_matches_report
       @matches.map do |match|
-        prefix(match) + highlight(@text[match.from...match.to], :red)
+        [
+          highlight(prefix(match), :dim),
+          " ",
+          highlight(@text[match.from...match.to], :red_underline)
+        ].join
       end.map(&:lstrip)
     end
 
     def text_with_matches_report
-      prefix + @matches.inject(@text) do |text, match|
-        pre_match  = text[0...match.from]
-        the_match  = text[match.from...match.to]
-        post_match = text[match.to...text.length]
+      [
+        highlight(prefix, :dim),
+        " ",
+        @matches.reverse.inject(@text) do |text, match|
+          pre_match  = text[0...match.from]
+          the_match  = text[match.from...match.to]
+          post_match = text[match.to...text.length]
 
-        pre_match + highlight(the_match, :red) + post_match
-      end.lstrip
+          pre_match + highlight(the_match, :red_underline) + post_match
+        end.lstrip
+      ].join
     end
 
     def prefix(match = nil)
       return "#{filename}" unless @opts[:line_numbers]
 
       if match
-        "#{filename}#{@line_number}:#{match.from + 1}: "
+        "#{filename}#{@line_number}:#{match.from + 1}:"
       else
-        "#{filename}#{@line_number}: "
+        "#{filename}#{@line_number}:"
       end
     end
 
@@ -56,12 +64,12 @@ module Rex
       @opts[:print_file_names] ? "#{File.basename(@path)}:" : ""
     end
 
-    def highlight(text, color)
+    def highlight(text, style)
       case @opts[:highlight]
-      when true then text.highlight(color)
+      when true then text.highlight(style)
       when false then text
       else
-        output_is_a_tty? ? text.highlight(color) : text
+        output_is_a_tty? ? text.highlight(style) : text
       end
     end
 
