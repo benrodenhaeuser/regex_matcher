@@ -35,10 +35,22 @@ module Rex
 
     # NOTE:
     # - prepend_line_number does not work in the only_matches/with_line_numbers
-    #   case, because there we have several lines
+    #   case, because there we have several lines. so we seem to need a
+    #   distinction there.
     # - proper_segments and proper_matches are terrible names
     # - highlighting is something that is common to all cases, so we could
     #   perhaps unify it somehow
+
+    # three kinds of prefixes:
+    # - empty
+    # - with line number + ": "
+    # - with line number + ":" + column number + " "
+    #
+    # maybe we should prepare an array of "report lines" (= strings)
+    #
+    # maybe it is useful to have a Report class, after all?
+    # the report needs the @text and the @matches as inputs, but not
+    # consume and cursor. so it's not so cohesive.
 
     def write_report
       if @opts[:only_matches]
@@ -47,10 +59,10 @@ module Rex
             proper_matches = @matches.reject { |match| match.from == match.to }
 
             (0...proper_segments.length).map do |index|
-              "#{@line_number}:#{proper_matches[index].from + 1}: #{proper_segments[index].highlight}"
+              "#{@line_number}:#{proper_matches[index].from + 1}: #{highlight(proper_segments[index])}"
             end.join("\n")
           else
-            proper_segments.map(&:highlight).join("\n")
+            proper_segments.map { |item| highlight(item) }.join("\n")
           end
       else
         @report = @text + "\n"

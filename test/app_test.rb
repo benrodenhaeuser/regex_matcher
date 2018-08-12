@@ -3,10 +3,10 @@ require 'minitest/autorun'
 require_relative '../lib/application.rb'
 
 TEST_DEFAULTS = {
-  line_numbers: false,
-  global:       true,
-  all_lines:    false,
-  only_matches: true
+  line_numbers: false, # NO LINE NUMBERS
+  global:       true,  # GLOBAL MATCHING
+  all_lines:    false, # ONLY LINES WITH MATCHES
+  only_matches: true   # ONLY THE MATCHES WITHIN LINES
 }.freeze
 
 class TokenizerText < Minitest::Test
@@ -86,17 +86,19 @@ class AppTest < Minitest::Test
     File.read(@out_path)
   end
 
-  def test_literal_concatenation
+  def test_concatenation_of_literals
+    # skip
     actual = output(
       pattern: 'test',
       text: 'test abcd test abcd'
     )
-    expected = "test, test\n"
+    expected = "test\ntest\n"
 
     assert_equal(expected, actual)
   end
 
   def test_one_match_mode
+    # skip
     user_options = { global: false }
 
     actual = output(
@@ -110,6 +112,7 @@ class AppTest < Minitest::Test
   end
 
   def test_line_numbers
+    # skip
     user_options = { line_numbers: true }
 
     actual = output(
@@ -117,32 +120,35 @@ class AppTest < Minitest::Test
       text: 'test abcd test abcd',
       opts: user_options
     )
-    expected = "1: test, test\n"
+    expected = "1:1: test\n1:11: test\n"
 
     assert_equal(expected, actual)
   end
 
   def test_alternation
+    # skip
     actual = output(
       pattern: 'man|park',
       text: 'a man is walking in the park.'
     )
-    expected = "man, park\n"
+    expected = "man\npark\n"
 
     assert_equal(expected, actual)
   end
 
   def test_star
+    # skip
     actual = output(
       pattern: '(a|b)*',
       text: 'aaabbbcccab'
     )
-    expected = "aaabbb, ab\n"
+    expected = "aaabbb\nab\n"
 
     assert_equal(expected, actual)
   end
 
   def test_option1
+    # skip
     actual = output(
       pattern: 'a?',
       text: 'a'
@@ -153,6 +159,7 @@ class AppTest < Minitest::Test
   end
 
   def test_option2
+    # skip
     actual = output(
       pattern: 'a?',
       text: 'b'
@@ -163,6 +170,7 @@ class AppTest < Minitest::Test
   end
 
   def test_option3
+    # skip
     actual = output(
       pattern: 'colou?r',
       text: 'colour'
@@ -173,6 +181,7 @@ class AppTest < Minitest::Test
   end
 
   def test_option4
+    # skip
     actual = output(
       pattern: 'colou?r',
       text: 'color'
@@ -183,16 +192,18 @@ class AppTest < Minitest::Test
   end
 
   def test_dot
+    # skip
     actual = output(
       pattern: '.',
       text: 'aaabbb'
     )
-    expected = "a, a, a, b, b, b\n"
+    expected = ["a\n", "a\n", "a\n", "b\n", "b\n", "b\n"].join
 
     assert_equal(expected, actual)
   end
 
   def test_dot_star
+    # skip
     actual = output(
       pattern: '.*',
       text: 'aaabbb'
@@ -203,6 +214,7 @@ class AppTest < Minitest::Test
   end
 
   def test_slightly_more_complicated_regex
+    # skip
     actual = output(
       pattern: '(a|b)*(a|b)',
       text: 'aaabbba'
@@ -213,6 +225,7 @@ class AppTest < Minitest::Test
   end
 
   def test_multiline_input
+    # skip
     input = <<~HEREDOC
       aaabb
       bbbccc

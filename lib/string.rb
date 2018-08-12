@@ -12,5 +12,5 @@ class String
 
   def highlight
     red.underline
-  end
+  end 
 end
