@@ -73,8 +73,13 @@ module Rex
     end
 
     def highlight(the_match)
-      return the_match unless output_is_a_tty?
-      the_match.highlight
+      case @opts[:highlight]
+      when true then return the_match.highlight
+      when false then return the_match
+      else
+        return the_match.highlight if output_is_a_tty?
+        the_match
+      end
     end
 
     def output_is_a_tty?

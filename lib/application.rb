@@ -6,7 +6,8 @@ module Rex
       line_numbers: true,
       global:       true,
       all_lines:    false,
-      only_matches: false
+      only_matches: false,
+      highlight:    :auto
     }.freeze
 
     def initialize(pattern:, inp_path: nil, out_path: nil, user_options: {})

@@ -3,10 +3,11 @@ require 'minitest/autorun'
 require_relative '../lib/application.rb'
 
 TEST_DEFAULTS = {
-  line_numbers: false, # NO LINE NUMBERS!
-  global:       true,  # GLOBAL MATCHING!
-  all_lines:    false, # ONLY LINES WITH MATCHES!
-  only_matches: true   # ONLY THE MATCHES!
+  line_numbers: false,
+  global:       true,
+  all_lines:    false,
+  only_matches: true,
+  highlight:    false
 }.freeze
 
 class TokenizerText < Minitest::Test
@@ -285,6 +286,34 @@ class AppTest < Minitest::Test
       1:1: test
       1:11: test
     HEREDOC
+    assert_equal(expected, actual)
+  end
+
+  def test_highlighting1
+    user_options = { highlight: true }
+    actual = output(
+      pattern: 'test',
+      text: 'test',
+      opts: user_options
+    )
+    expected = "\e[4m\e[31mtest\e[0m\e[0m\n"
+    # ^ to verify this is what we need:
+    # `$ echo -e "\e[4m\e[31mtest\e[0m\e[0m\n"`
+    # (the `-e` switch is to interpret escape characters)
+    assert_equal(expected, actual)
+  end
+
+  def test_highlighting2
+    user_options = {
+      highlight: true,
+      only_matches: false
+    }
+    actual = output(
+      pattern: 'test',
+      text: 'somestuffandtestandmorestuff',
+      opts: user_options
+    )
+    expected = "somestuffand\e[4m\e[31mtest\e[0m\e[0mandmorestuff\n"
     assert_equal(expected, actual)
   end
 
