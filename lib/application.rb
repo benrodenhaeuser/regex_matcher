@@ -23,6 +23,7 @@ module Rex
       if File.file?(@inp_path)
         process(@inp_path)
       else
+        @opts[:print_file_names] = true
         entries = Dir.entries(@inp_path)
         files = entries.select do |entry|
           File.file?(File.join(@inp_path, entry))

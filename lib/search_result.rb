@@ -43,13 +43,17 @@ module Rex
     end
 
     def prefix(match = nil)
-      return "#{File.basename(@path)}: " unless @opts[:line_numbers]
+      return "#{filename}" unless @opts[:line_numbers]
 
       if match
-        "#{File.basename(@path)}:#{@line_number}:#{match.from + 1}: "
+        "#{filename}#{@line_number}:#{match.from + 1}: "
       else
-        "#{File.basename(@path)}:#{@line_number}: "
+        "#{filename}#{@line_number}: "
       end
+    end
+
+    def filename
+      @opts[:print_file_names] ? "#{File.basename(@path)}: " : ""
     end
 
     def highlight(text)
