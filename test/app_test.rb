@@ -3,10 +3,10 @@ require 'minitest/autorun'
 require_relative '../lib/application.rb'
 
 TEST_DEFAULTS = {
-  line_numbers: false, # NO LINE NUMBERS
-  global:       true,  # GLOBAL MATCHING
-  all_lines:    false, # ONLY LINES WITH MATCHES
-  only_matches: true   # ONLY THE MATCHES WITHIN LINES
+  line_numbers: false, # NO LINE NUMBERS!
+  global:       true,  # GLOBAL MATCHING!
+  all_lines:    false, # ONLY LINES WITH MATCHES!
+  only_matches: true   # ONLY THE MATCHES!
 }.freeze
 
 class TokenizerText < Minitest::Test
@@ -107,20 +107,6 @@ class AppTest < Minitest::Test
       opts: user_options
     )
     expected = "test\n"
-
-    assert_equal(expected, actual)
-  end
-
-  def test_line_numbers
-    # skip
-    user_options = { line_numbers: true }
-
-    actual = output(
-      pattern: 'test',
-      text: 'test abcd test abcd',
-      opts: user_options
-    )
-    expected = "1:1: test\n1:11: test\n"
 
     assert_equal(expected, actual)
   end
@@ -238,7 +224,67 @@ class AppTest < Minitest::Test
       aaa
       ccc
     HEREDOC
-    expected = expected
+    assert_equal(expected, actual)
+  end
+
+  def test_with_line_numbers_and_full_line_output
+    # skip
+    user_options = {
+      line_numbers: true,
+      only_matches: false
+    }
+
+    input = <<~HEREDOC
+      first line
+      second line
+      third line
+    HEREDOC
+    actual = output(
+      pattern: 'second',
+      text: input,
+      opts: user_options
+    )
+    expected = <<~HEREDOC
+      2: second line
+    HEREDOC
+    assert_equal(expected, actual)
+  end
+
+  def test_with_full_line_output
+    # skip
+    user_options = {
+      only_matches: false
+    }
+
+    input = <<~HEREDOC
+      first line
+      second line
+      third line
+    HEREDOC
+    actual = output(
+      pattern: 'second',
+      text: input,
+      opts: user_options
+    )
+    expected = <<~HEREDOC
+      second line
+    HEREDOC
+    assert_equal(expected, actual)
+  end
+
+  def test_with_line_numbers
+    # skip
+    user_options = { line_numbers: true }
+
+    actual = output(
+      pattern: 'test',
+      text: 'test abcd test abcd',
+      opts: user_options
+    )
+    expected = <<~HEREDOC
+      1:1: test
+      1:11: test
+    HEREDOC
     assert_equal(expected, actual)
   end
 
