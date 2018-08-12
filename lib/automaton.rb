@@ -8,11 +8,6 @@ module Rex
     include Thompson
     include DFA
 
-    attr_accessor :initial
-    attr_accessor :terminal
-    attr_writer   :alphabet
-    attr_accessor :current
-
     def initialize(initial: nil, terminal: nil, alphabet: nil, states: nil)
       @initial  = initial
       @terminal = terminal
@@ -21,33 +16,8 @@ module Rex
       @current  = @initial
     end
 
-    def alphabet
-      @alphabet ||= compute_alphabet
-    end
-
-    def compute_alphabet
-      alphabet = states.each_with_object(Set.new) do |state, alph|
-        alph.merge(state.alphabet)
-      end
-
-      Set[*alphabet.reject { |char| char == '' }]
-    end
-
-    def states
-      @states ||= compute_states
-    end
-
-    def compute_states
-      @initial.reachable
-    end
-
-    def reset
-      @current = @initial
-      self
-    end
-
     def step?(char)
-      current.moves[char]
+      @current.moves[char]
     end
 
     def step!(char)
@@ -59,7 +29,12 @@ module Rex
     end
 
     def terminal?
-      terminal.include?(current)
+      terminal.include?(@current)
+    end
+
+    def reset
+      @current = @initial
+      self
     end
 
     def to_s
@@ -67,11 +42,38 @@ module Rex
 
       transitions = states.map(&:collect_transitions).compact.join("\n")
 
-      "states: #{states}" \
-        "\ninitial: #{initial}" \
-        "\nterminal: #{terminal}" \
-        "\nalphabet: #{alphabet}" \
-        "\ntransitions:\n#{transitions}"
+      "states: #{states}\n" \
+        "initial: #{initial}\n" \
+        "terminal: #{terminal}\n" \
+        "alphabet: #{alphabet}\n" \
+        "transitions:\n#{transitions}\n"
+    end
+
+    protected
+
+    attr_accessor :initial
+    attr_accessor :terminal
+
+    def alphabet
+      @alphabet ||= compute_alphabet
+    end
+
+    def states
+      @states ||= compute_states
+    end
+
+    private
+
+    def compute_alphabet
+      alphabet = states.each_with_object(Set.new) do |state, alph|
+        alph.merge(state.alphabet)
+      end
+
+      Set[*alphabet.reject { |char| char == '' }]
+    end
+
+    def compute_states
+      @initial.reachable
     end
   end
 end
