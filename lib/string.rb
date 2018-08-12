@@ -10,7 +10,7 @@ class String
     "\e[#{UNDERLINE}m#{self}\e[0m"
   end
 
-  def highlight
-    red.underline
+  def highlight(color)
+    send(color).underline
   end
 end

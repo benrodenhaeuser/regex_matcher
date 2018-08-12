@@ -28,8 +28,8 @@ module Rex
 
     def only_matches_report
       @matches.map do |match|
-        prefix(match) + highlight(@text[match.from...match.to])
-      end
+        prefix(match) + highlight(@text[match.from...match.to], :red)
+      end.map(&:lstrip)
     end
 
     def text_with_matches_report
@@ -38,8 +38,8 @@ module Rex
         the_match  = text[match.from...match.to]
         post_match = text[match.to...text.length]
 
-        pre_match + highlight(the_match) + post_match
-      end
+        pre_match + highlight(the_match, :red) + post_match
+      end.lstrip
     end
 
     def prefix(match = nil)
@@ -53,15 +53,15 @@ module Rex
     end
 
     def filename
-      @opts[:print_file_names] ? "#{File.basename(@path)}: " : ""
+      @opts[:print_file_names] ? "#{File.basename(@path)}:" : ""
     end
 
-    def highlight(text)
+    def highlight(text, color)
       case @opts[:highlight]
-      when true then text.highlight
+      when true then text.highlight(color)
       when false then text
       else
-        output_is_a_tty? ? text.highlight : text
+        output_is_a_tty? ? text.highlight(color) : text
       end
     end
 
