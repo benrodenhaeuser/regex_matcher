@@ -2,9 +2,9 @@ require_relative './string.rb'
 
 module Rex
   class SearchResult
-    def initialize(text, row, matches)
+    def initialize(text, line_number, matches)
       @text = text
-      @row = row
+      @line_number = line_number
       @matches = matches
     end
 
@@ -16,69 +16,42 @@ module Rex
       @opts = opts
       @output = output
 
-      write_report
-      print_report
+      print_report(get_report)
     end
 
     private
 
-    # NOTE:
-    # - prepend_line_number does not work in the only_matches/with_line_numbers
-    #   case, because there we have several lines. so we seem to need a
-    #   distinction there.
-    # - proper_segments and proper_matches are terrible names
-    # - highlighting is something that is common to all cases, so we could
-    #   perhaps unify it somehow
+    def get_report
+      @opts[:only_matches] ? only_matches_report : text_with_matches_report
+    end
 
-    # three kinds of prefixes:
-    # - empty
-    # - with line number + ": "
-    # - with line number + ":" + column number + " "
-    #
-    # maybe we should prepare an array of "report lines" (= strings)
-
-    def write_report
-      if @opts[:only_matches]
-        @report =
-          if @opts[:line_numbers]
-            proper_matches = @matches.reject { |match| match.from == match.to }
-            (0...proper_segments.length).map do |index|
-              col = proper_matches[index].from + 1
-              "#{@row}:#{col}: #{highlight(proper_segments[index])}"
-            end.join("\n")
-          else
-            proper_segments.map { |item| highlight(item) }.join("\n")
-          end
-      else
-        @report = @text + "\n"
-        @matches.reverse_each do |match|
-          @report = process_match(match)
-        end
-        prepend_line_number
+    def only_matches_report
+      @matches.map do |match|
+        prefix(match) + highlight(@text[match.from...match.to])
       end
     end
 
-    def proper_segments
-      @matches.map do |match|
-        @text[match.from...match.to]
-      end.reject(&:empty?)
+    def text_with_matches_report
+      prefix + @matches.inject(@text) do |text, match|
+        pre_match  = text[0...match.from]
+        the_match  = text[match.from...match.to]
+        post_match = text[match.to...text.length]
+
+        pre_match + highlight(the_match) + post_match
+      end
     end
 
-    def process_match(match)
-      pre_match  = @report[0...match.from]
-      the_match  = @report[match.from...match.to]
-      post_match = @report[match.to...@report.length]
-
-      pre_match + highlight(the_match) + post_match
+    def prefix(match = nil)
+      return "" unless @opts[:line_numbers]
+      match ? "#{@line_number}:#{match.from + 1}: " : "#{@line_number}: "
     end
 
-    def highlight(the_match)
+    def highlight(text)
       case @opts[:highlight]
-      when true then return the_match.highlight
-      when false then return the_match
+      when true then text.highlight
+      when false then text
       else
-        return the_match.highlight if output_is_a_tty?
-        the_match
+        output_is_a_tty? ? text.highlight : text
       end
     end
 
@@ -86,14 +59,9 @@ module Rex
       @output.isatty
     end
 
-    def prepend_line_number
-      return unless @opts[:line_numbers]
-      @report = @row.to_s + ": " + @report
-    end
-
-    def print_report
-      return unless @matches.first || @opts[:all_lines]
-      @output.puts @report
+    def print_report(report)
+      return if @matches.empty? && !@opts[:all_lines]
+      @output.puts report
     end
   end
 end

@@ -129,7 +129,14 @@ class AppTest < Minitest::Test
       pattern: '(a|b)*',
       text: 'aaabbbcccab'
     )
-    expected = "aaabbb\nab\n"
+    expected = <<~HEREDOC
+      aaabbb
+
+
+
+      ab
+    HEREDOC
+    # ^ we choose to output empty matches. there are three here.
 
     assert_equal(expected, actual)
   end
