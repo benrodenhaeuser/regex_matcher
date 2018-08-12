@@ -17,6 +17,8 @@ module Rex
       @opts     = DEFAULT_OPTIONS.merge(user_options)
     end
 
+    # BUG: broken: "if no input path is given, use stdin."
+
     def run
       @output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 

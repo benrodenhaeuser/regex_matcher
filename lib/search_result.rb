@@ -51,7 +51,7 @@ module Rex
     end
 
     def prefix(match = nil)
-      return "#{filename}" unless @opts[:line_numbers]
+      return filename unless @opts[:line_numbers]
 
       if match
         "#{filename}#{@line_number}:#{match.from + 1}:"
