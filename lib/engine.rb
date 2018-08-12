@@ -17,6 +17,10 @@ module Rex
       SearchResult.new(text, @line_number, matches)
     end
 
+    def reset
+      @line_number = 0
+    end
+
     private
 
     def find_matches(text)

@@ -18,18 +18,35 @@ module Rex
     end
 
     def run
-      input  = @inp_path ? File.open(@inp_path, 'r') : $stdin.dup
-      output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
+      @output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
-      until input.eof?
-        engine.search(input.gets.chomp).report(@opts, output)
+      if File.file?(@inp_path)
+        process(@inp_path)
+      else
+        entries = Dir.entries(@inp_path)
+        files = entries.select do |entry|
+          File.file?(File.join(@inp_path, entry))
+        end
+
+        files.each { |file| process(File.join(@inp_path, file)) }
       end
 
-      input.close
-      output.close
+      @output.close
     end
 
     private
+
+    def process(path)
+      engine.reset
+
+      @input = path ? File.open(path, 'r') : $stdin.dup
+
+      until @input.eof?
+        engine.search(@input.gets.chomp).report(@opts, @output, path)
+      end
+
+      @input.close
+    end
 
     def engine
       @engine ||= Engine.new(@pattern, @opts)

@@ -12,16 +12,17 @@ module Rex
       @matches.reject(&:empty?).count
     end
 
-    def report(opts, output)
+    def report(opts, output, path)
       @opts = opts
       @output = output
+      @path = path
 
-      print_report(get_report)
+      print_report(make_report)
     end
 
     private
 
-    def get_report
+    def make_report
       @opts[:only_matches] ? only_matches_report : text_with_matches_report
     end
 
@@ -42,8 +43,13 @@ module Rex
     end
 
     def prefix(match = nil)
-      return "" unless @opts[:line_numbers]
-      match ? "#{@line_number}:#{match.from + 1}: " : "#{@line_number}: "
+      return "#{File.basename(@path)}: " unless @opts[:line_numbers]
+
+      if match
+        "#{File.basename(@path)}:#{@line_number}:#{match.from + 1}: "
+      else
+        "#{File.basename(@path)}:#{@line_number}: "
+      end
     end
 
     def highlight(text)
