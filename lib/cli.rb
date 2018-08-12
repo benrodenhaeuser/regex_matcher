@@ -19,8 +19,6 @@ module Rex
       ).run
     end
 
-    private
-
     def self.parse_options
       options = {}
 
@@ -35,11 +33,11 @@ module Rex
           options[:global] = false
         end
 
-        opts.on("--all-lines", "-a", "Output all input lines") do
+        opts.on("--all-lines", "-a", "All input lines") do
           options[:all_lines] = true
         end
 
-        opts.on("--matching-segments-only", "-m", "Output matching segments only") do
+        opts.on("--matching-segments-only", "-m", "Matching segments only") do
           options[:only_matches] = true
         end
       end
@@ -49,6 +47,8 @@ module Rex
       options
     end
 
+    private_class_method :parse_options
+
     def self.parse_arguments
       {
         pattern:  ARGV.shift,
@@ -56,5 +56,7 @@ module Rex
         out_path: ARGV.shift
       }
     end
+
+    private_class_method :parse_arguments
   end
 end

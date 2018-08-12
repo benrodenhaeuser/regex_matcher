@@ -46,7 +46,8 @@ module Rex
             proper_matches = @matches.reject { |match| match.from == match.to }
 
             (0...proper_segments.length).map do |index|
-              "#{@row}:#{proper_matches[index].from + 1}: #{highlight(proper_segments[index])}"
+              col = proper_matches[index].from + 1
+              "#{@row}:#{col}: #{highlight(proper_segments[index])}"
             end.join("\n")
           else
             proper_segments.map { |item| highlight(item) }.join("\n")
