@@ -21,12 +21,14 @@ module Rex
       output = @out_path ? File.open(@out_path, 'w') : $stdout.dup
 
       until input.eof?
-        engine.match(input.gets.chomp).report(@opts, output)
+        engine.search(input.gets.chomp).report(@opts, output)
       end
 
       input.close
       output.close
     end
+
+    private
 
     def engine
       @engine ||= Engine.new(@pattern, @opts[:global])

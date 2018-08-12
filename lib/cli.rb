@@ -15,6 +15,8 @@ module Rex
       ).run
     end
 
+    private
+
     def self.parse_options
       options = {}
 
