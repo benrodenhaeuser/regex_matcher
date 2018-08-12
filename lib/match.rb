@@ -11,5 +11,9 @@ module Rex
     def found?
       @to
     end
+
+    def empty?
+      from == to
+    end
   end
 end

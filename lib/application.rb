@@ -31,7 +31,7 @@ module Rex
     private
 
     def engine
-      @engine ||= Engine.new(@pattern, @opts[:global])
+      @engine ||= Engine.new(@pattern, @opts)
     end
   end
 end

@@ -8,6 +8,10 @@ module Rex
       @matches = matches
     end
 
+    def count_matches
+      @matches.reject(&:empty?).count
+    end
+
     def report(opts, output)
       @opts = opts
       @output = output
@@ -17,8 +21,6 @@ module Rex
     end
 
     private
-
-    # TODO: this is a nightmare
 
     # NOTE:
     # - prepend_line_number does not work in the only_matches/with_line_numbers
@@ -34,17 +36,12 @@ module Rex
     # - with line number + ":" + column number + " "
     #
     # maybe we should prepare an array of "report lines" (= strings)
-    #
-    # maybe it is useful to have a Report class, after all?
-    # the report needs the @text and the @matches as inputs, but not
-    # consume and cursor. so it's not so cohesive.
 
     def write_report
       if @opts[:only_matches]
         @report =
           if @opts[:line_numbers]
             proper_matches = @matches.reject { |match| match.from == match.to }
-
             (0...proper_segments.length).map do |index|
               col = proper_matches[index].from + 1
               "#{@row}:#{col}: #{highlight(proper_segments[index])}"

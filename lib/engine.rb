@@ -5,45 +5,48 @@ require_relative './search_result.rb'
 
 module Rex
   class Engine
-    def initialize(pattern, global)
+    def initialize(pattern, opts)
       @automaton   = Parser.new(pattern).parse.to_automaton.to_dfa
-      @global      = global
+      @opts        = opts
       @line_number = 0
     end
 
     def search(text)
-      @line = Line.new(text)
-      find_matches
-      SearchResult.new(text, @line_number += 1, @matches)
+      @line_number += 1
+      matches = find_matches(text)
+      SearchResult.new(text, @line_number, matches)
     end
 
     private
 
-    def find_matches
-      @matches = []
+    def find_matches(text)
+      matches = []
+      line = Line.new(text)
 
       loop do
-        break unless @line.cursor
-        @match = Match.new(@line.position)
+        break unless line.cursor
+        match = Match.new(line.position)
         @automaton.reset
 
-        seek
+        seek(match, line)
 
-        if @match.found?
-          @matches << @match
-          break unless @global
+        if match.found?
+          matches << match
+          break unless @opts[:global]
         end
 
-        @line.position = [@match.from + 1, @match.to].compact.max
+        line.position = [match.from + 1, match.to].compact.max
       end
+
+      matches
     end
 
-    def seek
+    def seek(match, line)
       loop do
-        @match.to = @line.position if @automaton.terminal?
-        break unless @automaton.step?(@line.cursor)
-        @automaton.step!(@line.cursor)
-        @line.consume
+        match.to = line.position if @automaton.terminal?
+        break unless @automaton.step?(line.cursor)
+        @automaton.step!(line.cursor)
+        line.consume
       end
     end
   end
