@@ -2,10 +2,14 @@ require 'optparse'
 require_relative './application.rb'
 
 module Rex
+  class CliError < RuntimeError; end
+
   class CLI
     def self.run
       options   = parse_options
       arguments = parse_arguments
+
+      raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
       Application.new(
         pattern:      arguments[:pattern],
