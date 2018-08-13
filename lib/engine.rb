@@ -8,17 +8,11 @@ module Rex
     def initialize(pattern, opts)
       @automaton   = Parser.new(pattern).parse.to_automaton.to_dfa
       @opts        = opts
-      @line_number = 0
     end
 
     def search(text)
-      @line_number += 1
       matches = find_matches(text)
-      SearchResult.new(text, @line_number, matches)
-    end
-
-    def reset
-      @line_number = 0
+      SearchResult.new(text, matches)
     end
 
     private
