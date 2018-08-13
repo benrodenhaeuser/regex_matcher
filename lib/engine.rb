@@ -5,9 +5,9 @@ require_relative './result.rb'
 
 module Rex
   class Engine
-    def initialize(pattern, opts)
-      @automaton   = Parser.new(pattern).parse.to_automaton.to_dfa
-      @opts        = opts
+    def initialize(pattern, global)
+      @automaton = Parser.new(pattern).parse.to_automaton.to_dfa
+      @global    = global
     end
 
     def search(text)
@@ -30,7 +30,7 @@ module Rex
 
         if match.found?
           matches << match
-          break unless @opts[:global]
+          break unless @global
         end
 
         line.position = [match.from + 1, match.to].compact.max

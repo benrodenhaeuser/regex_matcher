@@ -11,7 +11,6 @@ module Rex
       global:           true,  # -o to enable one match per line
       highlight:        :auto, # not accessible via CLI
       print_file_names: nil    # not accessible via CLI, set by `run`
-
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
@@ -33,7 +32,7 @@ module Rex
     private
 
     def engine
-      @engine ||= Engine.new(@pattern, @opts)
+      @engine ||= Engine.new(@pattern, @opts[:global])
     end
 
     def git_files
