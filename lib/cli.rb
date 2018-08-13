@@ -9,10 +9,6 @@ module Rex
       options   = parse_options
       arguments = parse_arguments
 
-      if options.delete(:git)
-        ARGV.replace(`git ls-tree -r HEAD --name-only`.split("\n"))
-      end
-
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
       Application.new(
