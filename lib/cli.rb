@@ -11,11 +11,13 @@ module Rex
 
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
-      Application.new(
+      app = Application.new(
         pattern:      arguments[:pattern],
         input:        arguments[:input],
         user_options: options
-      ).run
+      )
+
+      app.run
     end
 
     def self.parse_options

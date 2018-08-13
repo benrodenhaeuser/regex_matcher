@@ -1,7 +1,7 @@
 require_relative './string.rb'
 
 module Rex
-  class SearchResult
+  class Result
     def initialize(text, matches)
       @text = text
       @matches = matches
@@ -29,9 +29,8 @@ module Rex
       my_report = @matches.map do |match|
         [
           highlight(prefix(match), :dim),
-          " ",
           highlight(@text[match.from...match.to], :red_underline)
-        ].join
+        ].join(" ")
       end
       my_report.map!(&:lstrip) unless @opts[:whitespace]
       my_report
@@ -47,7 +46,7 @@ module Rex
       end
       my_report.lstrip! unless @opts[:whitespace]
 
-      [highlight(prefix, :dim), " ", my_report].join
+      [highlight(prefix, :dim), my_report].join(" ")
     end
 
     def prefix(match = nil)

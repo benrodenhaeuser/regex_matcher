@@ -9,8 +9,8 @@ module Rex
       all_lines:        false,
       only_matches:     false,
       highlight:        :auto, # not accessible via CLI
-      print_file_names: nil    # not accessible via CLI
-      global:           true,  # affects the engine
+      print_file_names: nil,   # not accessible via CLI
+      global:           true   # affects the engine
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
@@ -36,7 +36,7 @@ module Rex
     end
 
     def git_files
-      `git ls-tree -r HEAD --name-only`.lines
+      `git ls-tree -r HEAD --name-only`.split("\n")
     end
   end
 end

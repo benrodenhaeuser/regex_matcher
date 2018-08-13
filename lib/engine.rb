@@ -1,7 +1,7 @@
 require_relative './parser.rb'
 require_relative './line.rb'
 require_relative './match.rb'
-require_relative './search_result.rb'
+require_relative './result.rb'
 
 module Rex
   class Engine
@@ -12,7 +12,7 @@ module Rex
 
     def search(text)
       matches = find_matches(text)
-      SearchResult.new(text, matches)
+      Result.new(text, matches)
     end
 
     private
