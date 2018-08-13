@@ -2,15 +2,16 @@ require_relative './engine.rb'
 
 module Rex
   class Application
-    DEFAULT_OPTIONS = {
-      line_numbers:     true,
-      whitespace:       false,
-      git:              false,
-      all_lines:        false,
-      only_matches:     false,
+    DEFAULT_OPTIONS = {        # user overrides:
+      line_numbers:     true,  # -d to disable line numbers
+      whitespace:       false, # -w to prevent lstrip
+      git:              false, # -g to enable git search
+      all_lines:        false, # -a to enable all lines output
+      only_matches:     false, # -m to enable only matches output
+      global:           true,  # -o to enable one match per line
       highlight:        :auto, # not accessible via CLI
-      print_file_names: nil,   # not accessible via CLI
-      global:           true   # affects the engine
+      print_file_names: nil    # not accessible via CLI, set by `run`
+
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
