@@ -2,15 +2,15 @@ require_relative './engine.rb'
 
 module Rex
   class Application
-    DEFAULT_OPTIONS = {        # user overrides:
+    DEFAULT_OPTIONS = {        # user options (CLI):
       line_numbers:     true,  # -d to disable line numbers
       whitespace:       false, # -w to prevent lstrip
       git:              false, # -g to enable git search
       all_lines:        false, # -a to enable all lines output
       only_matches:     false, # -m to enable only matches output
       global:           true,  # -o to enable one match per line
-      highlight:        :auto, # not accessible via CLI
-      print_file_names: nil    # not accessible via CLI, set by `run`
+      highlight:        :auto, # -h to enforce highlighting
+      print_file_names: nil    # -f to enforce file name printing
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
@@ -25,14 +25,14 @@ module Rex
 
       @input.each do |line|
         engine.search(line.chomp)
-              .report(@opts, @input.file.lineno, @input.filename)
+              .report(@input, @opts)
       end
     end
 
     private
 
     def engine
-      @engine ||= Engine.new(@pattern, @opts[:global])
+      @engine ||= Engine.new(@pattern, @opts)
     end
 
     def git_files

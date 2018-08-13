@@ -49,6 +49,14 @@ module Rex
         opts.on("--whitespace", "-w", "Leave leading whitespace intact") do
           options[:whitespace] = true
         end
+
+        opts.on("--highlight", "-h", "Enforce highlighting") do
+          options[:highlight] = true
+        end
+
+        opts.on("--file-names", "-f", "Enforce file name output") do
+          options[:print_file_names] = true
+        end
       end
 
       option_parser.parse!

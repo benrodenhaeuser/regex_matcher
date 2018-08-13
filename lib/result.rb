@@ -7,14 +7,10 @@ module Rex
       @matches = matches
     end
 
-    def count_matches
-      @matches.reject(&:empty?).count
-    end
-
-    def report(opts, lineno, filename)
+    def report(input, opts)
+      @lineno   = input.file.lineno
+      @filename = input.filename
       @opts     = opts
-      @lineno   = lineno
-      @filename = filename
 
       print_report(make_report)
     end
@@ -27,10 +23,15 @@ module Rex
 
     def only_matches_report
       my_report = @matches.map do |match|
-        [
-          highlight(prefix(match), :dim),
+        # TODO: refactor concatenation logic
+        if prefix.empty?
           highlight(@text[match.from...match.to], :red_underline)
-        ].join(" ")
+        else
+          [
+            highlight(prefix(match), :dim),
+            highlight(@text[match.from...match.to], :red_underline)
+          ].join(" ")
+        end
       end
       my_report.map!(&:lstrip) unless @opts[:whitespace]
       my_report
@@ -46,7 +47,12 @@ module Rex
       end
       my_report.lstrip! unless @opts[:whitespace]
 
-      [highlight(prefix, :dim), my_report].join(" ")
+      # TODO: refactor concatenation logic
+      if prefix.empty?
+        my_report
+      else
+        [highlight(prefix, :dim), my_report].join(" ")
+      end
     end
 
     def prefix(match = nil)

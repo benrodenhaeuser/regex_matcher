@@ -10,48 +10,6 @@ TEST_DEFAULTS = {
   highlight:    false
 }.freeze
 
-class TokenizerText < Minitest::Test
-  def test_escaped_star_is_tokenized_as_char
-    tokenizer = Rex::Tokenizer.new('\*')
-    actual = tokenizer.next_token.type
-    expected = Rex::Tokenizer::CHAR
-    assert_equal(expected, actual)
-  end
-
-  def test_end_of_input_is_tokenized_as_eof_token
-    tokenizer = Rex::Tokenizer.new('a')
-    tokenizer.next_token # process 'a'
-    actual = tokenizer.next_token.type
-    expected = Rex::Tokenizer::EOF_TYPE
-    assert_equal(expected, actual)
-
-    actual = tokenizer.next_token.type
-    assert_equal(expected, actual)
-  end
-end
-
-class ParserTest < Minitest::Test
-  def test_unbalanced_parentheses_raise_exception1
-    parser = Rex::Parser.new("(a|b|(c|d)")
-    assert_raises(Rex::RegexError) { parser.parse }
-  end
-
-  def test_unbalanced_parentheses_raise_exception2
-    parser = Rex::Parser.new("a)")
-    assert_raises(Rex::RegexError) { parser.parse }
-  end
-
-  def test_empty_subexpression_raises_exception1
-    parser = Rex::Parser.new("a|")
-    assert_raises(Rex::RegexError) { parser.parse }
-  end
-
-  def test_empty_subexpression_raises_exception2
-    parser = Rex::Parser.new("(*)|ab")
-    assert_raises(Rex::RegexError) { parser.parse }
-  end
-end
-
 class AppTest < Minitest::Test
   def setup
     path_to_current_dir = File.expand_path(File.dirname(__FILE__))
@@ -59,21 +17,26 @@ class AppTest < Minitest::Test
     Dir.mkdir(@data_path) unless Dir.exist?(@data_path)
 
     @inp_path = File.join(@data_path, 'input.txt')
+    ARGV.replace([@inp_path])
+
     @out_path = File.join(@data_path, 'output.txt')
+    @output = File.open(@out_path, 'w')
+    $stdout = @output
   end
 
   def app(pattern, opts = {})
     Rex::Application.new(
       pattern:      pattern,
-      inp_path:     @inp_path,
-      out_path:     @out_path,
+      input:        ARGF,
       user_options: TEST_DEFAULTS.merge(opts)
-    )
+    ).run
+    @output.close
+    $stdout = STDOUT
   end
 
   def output(pattern:, text:, opts: {})
     write_to_input_file(text)
-    app(pattern, opts).run
+    app(pattern, opts)
     read_from_output_file
   end
 
@@ -94,7 +57,6 @@ class AppTest < Minitest::Test
       text: 'test abcd test abcd'
     )
     expected = "test\ntest\n"
-
     assert_equal(expected, actual)
   end
 
@@ -274,9 +236,8 @@ class AppTest < Minitest::Test
       text: input,
       opts: user_options
     )
-    expected = <<~HEREDOC
-      second line
-    HEREDOC
+    expected = "second line\n"
+
     assert_equal(expected, actual)
   end
 
@@ -297,6 +258,7 @@ class AppTest < Minitest::Test
   end
 
   def test_highlighting1
+    # skip
     user_options = { highlight: true }
     actual = output(
       pattern: 'test',

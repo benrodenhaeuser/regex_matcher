@@ -5,9 +5,9 @@ require_relative './result.rb'
 
 module Rex
   class Engine
-    def initialize(pattern, global)
+    def initialize(pattern, opts)
       @automaton = Parser.new(pattern).parse.to_automaton.to_dfa
-      @global    = global
+      @global    = opts[:global]
     end
 
     def search(text)
