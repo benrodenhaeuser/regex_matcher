@@ -11,9 +11,10 @@ module Rex
       @matches.reject(&:empty?).count
     end
 
-    def report(opts, input)
-      @opts  = opts
-      @input = input
+    def report(opts, lineno, filename)
+      @opts     = opts
+      @lineno   = lineno
+      @filename = filename
 
       print_report(make_report)
     end
@@ -25,27 +26,28 @@ module Rex
     end
 
     def only_matches_report
-      @matches.map do |match|
+      my_report = @matches.map do |match|
         [
           highlight(prefix(match), :dim),
           " ",
           highlight(@text[match.from...match.to], :red_underline)
         ].join
-      end.map(&:lstrip)
+      end
+      my_report.map!(&:lstrip) unless @opts[:whitespace]
+      my_report
     end
 
     def text_with_matches_report
-      [
-        highlight(prefix, :dim),
-        " ",
-        @matches.reverse.inject(@text) do |text, match|
-          pre_match  = text[0...match.from]
-          the_match  = text[match.from...match.to]
-          post_match = text[match.to...text.length]
+      my_report = @matches.reverse.inject(@text) do |text, match|
+        pre_match  = text[0...match.from]
+        the_match  = text[match.from...match.to]
+        post_match = text[match.to...text.length]
 
-          pre_match + highlight(the_match, :red_underline) + post_match
-        end.lstrip
-      ].join
+        pre_match + highlight(the_match, :red_underline) + post_match
+      end
+      my_report.lstrip! unless @opts[:whitespace]
+
+      [highlight(prefix, :dim), " ", my_report].join
     end
 
     def prefix(match = nil)
@@ -59,11 +61,11 @@ module Rex
     end
 
     def filename
-      @opts[:print_file_names] ? "#{@input.filename}:" : ""
+      @opts[:print_file_names] ? "#{@filename}:" : ""
     end
 
     def lineno
-      @input.lineno
+      @lineno
     end
 
     def highlight(text, style)

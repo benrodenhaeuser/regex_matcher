@@ -3,11 +3,12 @@ require_relative './engine.rb'
 module Rex
   class Application
     DEFAULT_OPTIONS = {
-      line_numbers:     true,
-      global:           true,
-      all_lines:        false,
-      only_matches:     false,
-      highlight:        :auto
+      line_numbers: true,
+      global:       true,
+      all_lines:    false,
+      only_matches: false,
+      highlight:    :auto,
+      whitespace:   false
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
@@ -20,8 +21,8 @@ module Rex
       @opts[:print_file_names] = (@input.argv.size > 1 ? true : false)
 
       @input.each do |line|
-        engine.search(line.chomp).report(@opts, @input)
-        @input.lineno = 0 if @input.eof?
+        engine.search(line.chomp)
+              .report(@opts, @input.file.lineno, @input.filename)
       end
     end
 

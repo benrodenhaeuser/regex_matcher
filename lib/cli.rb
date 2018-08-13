@@ -9,6 +9,10 @@ module Rex
       options   = parse_options
       arguments = parse_arguments
 
+      if options.delete(:git)
+        ARGV.replace(`git ls-tree -r HEAD --name-only`.split("\n"))
+      end
+
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
       Application.new(
@@ -28,6 +32,10 @@ module Rex
           options[:line_numbers] = false
         end
 
+        opts.on("--git", "-g", "Search current git repository") do
+          options[:git] = true
+        end
+
         opts.on("--one-match", "-o", "One match per line") do
           options[:global] = false
         end
@@ -38,6 +46,10 @@ module Rex
 
         opts.on("--matching-segments-only", "-m", "Matching segments only") do
           options[:only_matches] = true
+        end
+
+        opts.on("--whitespace", "-w", "Leave leading whitespace intact") do
+          options[:whitespace] = true
         end
       end
 
