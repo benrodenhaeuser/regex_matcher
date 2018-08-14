@@ -288,6 +288,13 @@ class AppTest < Minitest::Test
     assert_equal(expected, actual)
   end
 
+  def test_with_backticks
+    expected = "1: def def def\n"
+    actual = `echo 'def def def' | bin/rex def`
+    assert_equal(expected, actual)
+  end
+
+
   def teardown
     File.delete(@inp_path) if File.exist?(@inp_path)
     File.delete(@out_path) if File.exist?(@out_path)

@@ -1,20 +1,39 @@
-require "rake/testtask"
+require 'colorize'
 
-desc 'Run tests'
+# runs all files in `test` directory whose name includes `test`
+# minitest output is logged to `test/reports`
+# displays a summary report after all tests have run
+desc 'Run all tests'
 task :test do
   run_tests
 end
 
-desc 'Run tests'
-task :default => :test
-
 def run_tests
-  test_files.each do |filename|
-    `ruby test/#{filename} > test/reports/#{filename}.txt`
-    puts `bin/rex -fdh '(0|1|2|3|4|5|6|7|8|9)* failures' ./test/reports/#{filename}.txt`
+  Dir.mkdir('test/reports') unless Dir.exist?('test/reports')
+
+  tests = 'ruby test/%{filename} | tee test/reports/%{filename}.txt'
+  regex =
+    "(0|1|2|3|4|5|6|7|8|9)* failures, " +
+    "(0|1|2|3|4|5|6|7|8|9)* errors"
+  rex = "bin/rex -fdh '%{regex}' ./test/reports/%{filename}.txt"
+  headline = ">>> test/%{filename}".colorize(:red)
+
+  summary = test_files.each_with_object('') do |filename, summary|
+    puts headline % { filename: filename}
+    system "#{tests % { filename: filename }}"
+    puts
+    summary << `#{rex % { filename: filename, regex: regex }}`
   end
+
+  puts ">>> summary".colorize(:red)
+  puts summary
 end
 
 def test_files
-  Dir.entries('./test').select { |file| File.file?(File.expand_path(file, 'test')) }
+  Dir.entries('./test')
+     .select { |file| File.file?(File.expand_path(file, 'test')) }
+     .select { |file| file.include?('test') }
 end
+
+desc 'Run all tests'
+task :default => :test

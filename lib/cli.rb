@@ -55,7 +55,7 @@ module Rex
         end
 
         opts.on("--file-names", "-f", "Enforce file name output") do
-          options[:print_file_names] = true
+          options[:file_names] = true
         end
       end
 
