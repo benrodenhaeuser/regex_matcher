@@ -66,7 +66,7 @@ module Rex
     end
 
     def filename
-      @opts[:print_file_names] ? "#{@filename}:" : ""
+      @opts[:print_file_names] ? "#{File.basename(@filename)}:" : ""
     end
 
     def lineno
