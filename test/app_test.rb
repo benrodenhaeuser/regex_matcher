@@ -17,42 +17,43 @@ class AppTest < Minitest::Test
     Dir.mkdir(@data_path) unless Dir.exist?(@data_path)
 
     @inp_path = File.join(@data_path, 'input.txt')
-    ARGV.replace([@inp_path])
-
     @out_path = File.join(@data_path, 'output.txt')
-    @output = File.open(@out_path, 'w')
-    $stdout = @output
   end
 
-  def app(pattern, opts = {})
+  def run_app(pattern, opts = {})
+    ARGV.replace([@inp_path])
+    @output = File.open(@out_path, 'w')
+    $stdout = @output
+
     Rex::Application.new(
       pattern:      pattern,
       input:        ARGF,
       user_options: TEST_DEFAULTS.merge(opts)
     ).run
-    @output.close
+
     $stdout = STDOUT
+    @output.close
   end
 
-  def output(pattern:, text:, opts: {})
-    write_to_input_file(text)
-    app(pattern, opts)
-    read_from_output_file
+  def app_output(pattern:, text:, opts: {})
+    prepare_input_file(text)
+    run_app(pattern, opts)
+    get_app_output_from_file
   end
 
   # write string we want to test against
-  def write_to_input_file(text)
+  def prepare_input_file(text)
     File.write(@inp_path, text)
   end
 
   # read output produced by engine
-  def read_from_output_file
+  def get_app_output_from_file
     File.read(@out_path)
   end
 
   def test_concatenation_of_literals
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'test',
       text: 'test abcd test abcd'
     )
@@ -64,7 +65,7 @@ class AppTest < Minitest::Test
     # skip
     user_options = { global: false }
 
-    actual = output(
+    actual = app_output(
       pattern: 'test',
       text: 'test abcd test abcd',
       opts: user_options
@@ -76,7 +77,7 @@ class AppTest < Minitest::Test
 
   def test_alternation
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'man|park',
       text: 'a man is walking in the park.'
     )
@@ -87,7 +88,7 @@ class AppTest < Minitest::Test
 
   def test_star
     # skip
-    actual = output(
+    actual = app_output(
       pattern: '(a|b)*',
       text: 'aaabbbcccab'
     )
@@ -98,14 +99,15 @@ class AppTest < Minitest::Test
 
       ab
     HEREDOC
-    # ^ we choose to output empty matches. there are three here.
+    # ^ we output empty matches. there are three here, each
+    #   corresponding to one 'c', so we have three empty lines.
 
     assert_equal(expected, actual)
   end
 
   def test_option1
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'a?',
       text: 'a'
     )
@@ -116,7 +118,7 @@ class AppTest < Minitest::Test
 
   def test_option2
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'a?',
       text: 'b'
     )
@@ -127,7 +129,7 @@ class AppTest < Minitest::Test
 
   def test_option3
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'colou?r',
       text: 'colour'
     )
@@ -138,7 +140,7 @@ class AppTest < Minitest::Test
 
   def test_option4
     # skip
-    actual = output(
+    actual = app_output(
       pattern: 'colou?r',
       text: 'color'
     )
@@ -149,7 +151,7 @@ class AppTest < Minitest::Test
 
   def test_dot
     # skip
-    actual = output(
+    actual = app_output(
       pattern: '.',
       text: 'aaabbb'
     )
@@ -160,7 +162,7 @@ class AppTest < Minitest::Test
 
   def test_dot_star
     # skip
-    actual = output(
+    actual = app_output(
       pattern: '.*',
       text: 'aaabbb'
     )
@@ -171,7 +173,7 @@ class AppTest < Minitest::Test
 
   def test_slightly_more_complicated_regex
     # skip
-    actual = output(
+    actual = app_output(
       pattern: '(a|b)*(a|b)',
       text: 'aaabbba'
     )
@@ -186,7 +188,7 @@ class AppTest < Minitest::Test
       aaabb
       bbbccc
     HEREDOC
-    actual = output(
+    actual = app_output(
       pattern: 'aaa|ccc',
       text: input
     )
@@ -209,7 +211,7 @@ class AppTest < Minitest::Test
       second line
       third line
     HEREDOC
-    actual = output(
+    actual = app_output(
       pattern: 'second',
       text: input,
       opts: user_options
@@ -231,7 +233,7 @@ class AppTest < Minitest::Test
       second line
       third line
     HEREDOC
-    actual = output(
+    actual = app_output(
       pattern: 'second',
       text: input,
       opts: user_options
@@ -245,7 +247,7 @@ class AppTest < Minitest::Test
     # skip
     user_options = { line_numbers: true }
 
-    actual = output(
+    actual = app_output(
       pattern: 'test',
       text: 'test abcd test abcd',
       opts: user_options
@@ -260,7 +262,7 @@ class AppTest < Minitest::Test
   def test_highlighting1
     # skip
     user_options = { highlight: true }
-    actual = output(
+    actual = app_output(
       pattern: 'test',
       text: 'test',
       opts: user_options
@@ -277,7 +279,7 @@ class AppTest < Minitest::Test
       highlight: true,
       only_matches: false
     }
-    actual = output(
+    actual = app_output(
       pattern: 'test',
       text: 'somestuffandtestandmorestuff',
       opts: user_options
