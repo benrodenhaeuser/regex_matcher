@@ -1,5 +1,5 @@
 require_relative './state.rb'
-require_relative './set.rb'
+require_relative './singleton.rb'
 require_relative './thompson.rb'
 require_relative './dfa.rb'
 
