@@ -1,4 +1,4 @@
-require_relative './string.rb'
+require_relative './highlighted_string.rb'
 
 module Rex
   class Result
