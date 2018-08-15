@@ -20,8 +20,8 @@ def run_tests
   headline = ">>> test/%{filename}".highlight(:red)
 
   summary = test_files.each_with_object('') do |filename, summary|
-    puts headline % { filename: filename}
-    sh tests % { filename: filename }
+    puts(headline % { filename: filename})
+    sh "#{tests % { filename: filename }}"
     puts
     summary << `#{rex % { filename: filename, regex: regex }}`
   end

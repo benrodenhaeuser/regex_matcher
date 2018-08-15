@@ -8,8 +8,6 @@ module Rex
     end
 
     attr_reader :files
-    alias :argv :files
-    # ^ Application instances need their input argument to respond to `argv`.
 
     def initialize(files)
       @files = files
@@ -20,9 +18,9 @@ module Rex
 
       loop do
         path = files.shift
-        break unless path
         @current = NamedFile.new(path)
         @current.file.each { |line| yield line }
+        break if files.empty?
       end
     end
 

@@ -1,5 +1,6 @@
 require 'optparse'
 require_relative './application.rb'
+require_relative './input.rb'
 
 module Rex
   class CliError < RuntimeError; end
@@ -107,7 +108,7 @@ module Rex
     def self.parse_arguments
       {
         pattern: ARGV.shift,
-        input:   ARGF
+        input:   Input[*ARGV]
       }
     end
 
