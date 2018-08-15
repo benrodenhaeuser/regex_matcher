@@ -1,4 +1,4 @@
-require_relative 'lib/rex/highlighted_string'
+require_relative 'lib/rex_cli/highlighted_string'
 
 # runs all files in `test` directory whose name includes `test`
 # minitest output is logged to `test/reports`

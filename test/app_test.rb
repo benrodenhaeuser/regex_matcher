@@ -1,7 +1,7 @@
 require 'minitest/autorun'
 
-require_relative '../lib/rex/application.rb'
-require_relative '../lib/rex/input.rb'
+require_relative '../lib/rex_cli/application.rb'
+require_relative '../lib/rex_cli/input.rb'
 
 TEST_DEFAULTS = {
   line_numbers: false,

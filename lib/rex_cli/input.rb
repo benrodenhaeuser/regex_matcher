@@ -35,7 +35,3 @@ module Rex
     end
   end
 end
-
-inp = Rex::Input['./lib/rex/application.rb', './lib/rex/ast.rb']
-val = Rex::Application.new(pattern: 'def', input: inp).report
-puts val
