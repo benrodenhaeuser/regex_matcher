@@ -34,11 +34,11 @@ module Rex
     end
 
     def no_of_files
-      @input.respond_to?(:argv) ? @input.argv.length : @input.filenames.length
+      @input.respond_to?(:argv) ? @input.argv.length : @input.files.length
     end
 
     def file_list
-      @input.respond_to?(:argv) ? @input.argv : @input.filenames
+      @input.respond_to?(:argv) ? @input.argv : @input.files
     end
 
     def git_files
