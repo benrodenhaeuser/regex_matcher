@@ -52,7 +52,7 @@ module Rex
 
     def prefix(match = nil)
       file = @opts[:filename]                             ? @filename      : nil
-      row  = @opts[:line_numbers]                         ? @lineno        : nil
+      row  = @opts[:line_numbers] && @filename != '-'     ? @lineno        : nil
       col  = @opts[:only_matches] && @opts[:line_numbers] ? match.from + 1 : nil
 
       the_prefix = [file, row, col].compact.join(':')
