@@ -1,1 +1,1 @@
-Rex is a regular expression engine with a CLI built from scratch, in Ruby.
+Rex is a regular expression engine based on finite state automata with a command line interface in the style of grep.

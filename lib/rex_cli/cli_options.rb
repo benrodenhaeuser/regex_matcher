@@ -15,11 +15,12 @@ module Rex
           - shows file names, but only if searching multiple files
 
       Notes:
-          - if `--git` is set, rex searches the files currently under git
-            source control (as of last commit)
-          - if `file(s)` argument is absend (and `--git` not set), rex reads
-            from stdin
-          - rex will print start column of each match if `-m` switch is set
+          - use `rex --git pattern` to search files under source control
+          - rex supports piping just like standard command line tools:
+            - use `rex [options] pattern` (without file argument) to have rex
+              read from stdin
+            - append `> file` to your command to have rex write output to file
+            - use pipes (`|`) in the usual way
 
       Options:
     HEREDOC
