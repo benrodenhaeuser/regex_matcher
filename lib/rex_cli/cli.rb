@@ -6,6 +6,8 @@ module Rex
 
   class CLI
     def self.run
+      handle_sigint
+
       ARGV << '--help' if ARGV.empty?
 
       options   = parse_options
@@ -110,5 +112,14 @@ module Rex
     end
 
     private_class_method :parse_arguments
+
+    def self.handle_sigint
+      trap "SIGINT" do
+        puts; puts "Good-bye"
+        exit!
+      end
+    end
+
+    private_class_method :handle_sigint
   end
 end
