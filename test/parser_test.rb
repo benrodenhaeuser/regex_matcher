@@ -16,8 +16,19 @@ class TokenizerText < Minitest::Test
     actual = tokenizer.next_token.type
     expected = Rex::Tokenizer::EOF_TYPE
     assert_equal(expected, actual)
-
+    # still eof after another read:
     actual = tokenizer.next_token.type
+    assert_equal(expected, actual)
+  end
+
+  def tokenize_esaped_char
+    tokenizer = Rex::Tokenizer.new('\(')
+    token = tokenizer.next_token
+    actual = token.type
+    expected = Rex::Tokenizer::CHAR
+    assert_equal(expected, actual)
+    actual = token.text
+    expected = '('
     assert_equal(expected, actual)
   end
 end

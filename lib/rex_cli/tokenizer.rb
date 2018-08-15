@@ -3,6 +3,9 @@ module Rex
   # ^ "Basic Latin" character set
   #   see https://en.wikipedia.org/wiki/List_of_Unicode_characters#Basic_Latin
 
+  ESCAPED = %w(* + ( ) ? . |)
+  # ^ Characters that need to be preceded with backslash to be used as literals
+
   class Tokenizer
     EOF        = -1
     START_TYPE = 0
@@ -45,7 +48,7 @@ module Rex
           Token.new(DOT, @cursor)
         when BACKSLASH
           consume
-          raise "illegal char #{@cursor}" unless ALPHABET.include?(@cursor)
+          raise "illegal char #{@cursor}" unless ESCAPED.include?(@cursor)
           Token.new(CHAR, @cursor)
         else
           raise "illegal char #{@cursor}" unless ALPHABET.include?(@cursor)
