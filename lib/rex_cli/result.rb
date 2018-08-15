@@ -2,7 +2,6 @@ require_relative './highlighted_string.rb'
 
 module Rex
   class Result
-
     def initialize(text, matches)
       @text = text
       @matches = matches

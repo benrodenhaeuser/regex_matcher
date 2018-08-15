@@ -4,11 +4,11 @@ module Rex
   class Application
     DEFAULT_OPTIONS = {     # CLI options cheatsheet:
       line_numbers:  true,  # -d to disable line numbers
-      whitespace:    false, # -w to prevent lstrip
       git:           false, # -g to enable git search
+      global:        true,  # -o to enable one match per line
       all_lines:     false, # -a to enable all lines output
       only_matches:  false, # -m to enable only matches output
-      global:        true,  # -o to enable one match per line
+      whitespace:    false, # -w to prevent lstrip
       highlight:     :auto, # -h to enforce highlighting
       file_names:    nil    # -f to enforce file name printing
     }.freeze
