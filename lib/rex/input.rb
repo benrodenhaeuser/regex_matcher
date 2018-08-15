@@ -26,7 +26,3 @@ module Rex
     end
   end
 end
-
-input = Rex::Input['ab']
-p input.filenames
-p input.filenames.length
