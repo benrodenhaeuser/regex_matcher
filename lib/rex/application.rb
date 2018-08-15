@@ -2,7 +2,7 @@ require_relative './engine.rb'
 
 module Rex
   class Application
-    DEFAULT_OPTIONS = {     # user options (CLI):
+    DEFAULT_OPTIONS = {     # CLI options cheatsheet:
       line_numbers:  true,  # -d to disable line numbers
       whitespace:    false, # -w to prevent lstrip
       git:           false, # -g to enable git search
@@ -17,26 +17,28 @@ module Rex
       @pattern = pattern
       @input   = input
       @opts    = DEFAULT_OPTIONS.merge(user_options)
+
+      @engine ||= Engine.new(@pattern, @opts)
     end
 
     def run
       process_options
-
-      @input.each do |line|
-        engine.search(line.chomp)
-              .report(@input, @opts)
-      end
+      @input.each { |line| @engine.search(line.chomp).report(@input, @opts) }
     end
 
     private
 
     def process_options
-      ARGV.replace(git_files) if @opts[:git]
-      @opts[:file_names] ||= @input.argv.size > 1 if @input.respond_to?(:argv)
+      file_list.replace(git_files) if @opts[:git]
+      @opts[:file_names] ||= no_of_files > 1
     end
 
-    def engine
-      @engine ||= Engine.new(@pattern, @opts)
+    def no_of_files
+      @input.respond_to?(:argv) ? @input.argv.length : @input.filenames.length
+    end
+
+    def file_list
+      @input.respond_to?(:argv) ? @input.argv : @input.filenames
     end
 
     def git_files
