@@ -1,4 +1,4 @@
-require 'colorize'
+require_relative 'lib/rex/highlighted_string'
 
 # runs all files in `test` directory whose name includes `test`
 # minitest output is logged to `test/reports`
@@ -16,7 +16,7 @@ def run_tests
     "(0|1|2|3|4|5|6|7|8|9)* failures, " +
     "(0|1|2|3|4|5|6|7|8|9)* errors"
   rex = "bin/rex -fdh '%{regex}' ./test/reports/%{filename}.txt"
-  headline = ">>> test/%{filename}".colorize(:red)
+  headline = ">>> test/%{filename}".highlight(:red)
 
   summary = test_files.each_with_object('') do |filename, summary|
     puts headline % { filename: filename}
@@ -25,7 +25,7 @@ def run_tests
     summary << `#{rex % { filename: filename, regex: regex }}`
   end
 
-  puts ">>> summary".colorize(:red)
+  puts ">>> summary".highlight(:red)
   puts summary
 end
 
