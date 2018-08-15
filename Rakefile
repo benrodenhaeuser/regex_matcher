@@ -1,4 +1,5 @@
 require_relative 'lib/rex_cli/highlighted_string'
+require 'bundler/gem_tasks'
 
 # runs all files in `test` directory whose name includes `test`
 # minitest output is logged to `test/reports`
