@@ -23,7 +23,7 @@ module Rex
 
     def run
       process_options
-      @input.each { |line| @engine.search(line.chomp).report(@input, @opts) }
+      @input.each { |line| @engine.search(line.chomp).report!(@input, @opts) }
     end
 
     private

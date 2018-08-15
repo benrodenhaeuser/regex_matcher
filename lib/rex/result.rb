@@ -2,25 +2,27 @@ require_relative './highlighted_string.rb'
 
 module Rex
   class Result
-    
+
     def initialize(text, matches)
       @text = text
       @matches = matches
     end
 
-    def report(input, opts)
+    def report!(input, opts)
+      return if @matches.empty? && !opts[:all_lines]
+
       @lineno   = input.file.lineno
       @filename = input.filename
       @opts     = opts
 
-      print_report(make_report)
+      puts report
+    end
+
+    def report
+      @opts[:only_matches] ? only_matches_report : text_with_matches_report
     end
 
     private
-
-    def make_report
-      @opts[:only_matches] ? only_matches_report : text_with_matches_report
-    end
 
     def only_matches_report
       my_report = @matches.map do |match|
@@ -81,11 +83,6 @@ module Rex
       else
         $stdout.isatty ? text.highlight(style) : text
       end
-    end
-
-    def print_report(report)
-      return if @matches.empty? && !@opts[:all_lines]
-      puts report
     end
   end
 end
