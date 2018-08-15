@@ -1,7 +1,6 @@
 require_relative './named_file.rb'
 require_relative './application.rb'
 
-
 module Rex
   class Input
     def self.[](*files)
@@ -9,6 +8,8 @@ module Rex
     end
 
     attr_reader :files
+    alias :argv :files
+    # ^ Application instances need their input argument to respond to `argv`.
 
     def initialize(files)
       @files = files
