@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 
-require_relative '../lib/application.rb'
+require_relative '../lib/rex/application.rb'
 
 TEST_DEFAULTS = {
   line_numbers: false,

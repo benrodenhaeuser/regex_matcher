@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative './application.rb'
+require_relative './rex/application.rb'
 
 module Rex
   class CliError < RuntimeError; end

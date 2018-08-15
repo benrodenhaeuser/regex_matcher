@@ -1,6 +1,6 @@
 require 'minitest/autorun'
 
-require_relative '../lib/application.rb'
+require_relative '../lib/rex/application.rb'
 
 class TokenizerText < Minitest::Test
   def test_escaped_star_is_tokenized_as_char

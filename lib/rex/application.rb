@@ -1,4 +1,4 @@
-require_relative './rex/engine.rb'
+require_relative './engine.rb'
 
 module Rex
   class Application
