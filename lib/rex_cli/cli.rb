@@ -25,6 +25,24 @@ module Rex
       app.report!
     end
 
+    def self.parse_arguments
+      {
+        pattern: ARGV.shift,
+        input:   Input[*ARGV]
+      }
+    end
+
+    private_class_method :parse_arguments
+
+    def self.handle_sigint
+      trap "SIGINT" do
+        puts; puts "Good-bye"
+        exit!
+      end
+    end
+
+    private_class_method :handle_sigint
+
     BANNER = <<~HEREDOC
       Usage: rex [options] pattern [file(s)]
 
@@ -104,23 +122,5 @@ module Rex
     end
 
     private_class_method :parse_options
-
-    def self.parse_arguments
-      {
-        pattern: ARGV.shift,
-        input:   Input[*ARGV]
-      }
-    end
-
-    private_class_method :parse_arguments
-
-    def self.handle_sigint
-      trap "SIGINT" do
-        puts; puts "Good-bye"
-        exit!
-      end
-    end
-
-    private_class_method :handle_sigint
   end
 end

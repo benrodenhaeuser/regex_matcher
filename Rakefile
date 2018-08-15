@@ -12,7 +12,7 @@ end
 def run_tests
   Dir.mkdir('test/reports') unless Dir.exist?('test/reports')
 
-  tests = 'ruby test/%{filename} | tee test/reports/%{filename}.txt'
+  run_tests = "ruby test/%{filename} | tee test/reports/%{filename}.txt"
   regex =
     "(0|1|2|3|4|5|6|7|8|9)* failures, " +
     "(0|1|2|3|4|5|6|7|8|9)* errors"
@@ -20,8 +20,8 @@ def run_tests
   headline = ">>> test/%{filename}".highlight(:red)
 
   summary = test_files.each_with_object('') do |filename, summary|
-    puts(headline % { filename: filename})
-    sh "#{tests % { filename: filename }}"
+    puts headline % { filename: filename}
+    system "#{run_tests % { filename: filename }}"
     puts
     summary << `#{rex % { filename: filename, regex: regex }}`
   end
