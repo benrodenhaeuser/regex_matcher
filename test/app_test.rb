@@ -1,6 +1,7 @@
 require 'minitest/autorun'
 
 require_relative '../lib/rex/application.rb'
+require_relative '../lib/rex/input.rb'
 
 TEST_DEFAULTS = {
   line_numbers: false,
@@ -21,13 +22,12 @@ class AppTest < Minitest::Test
   end
 
   def run_app(pattern, opts = {})
-    ARGV.replace([@inp_path])
     @output = File.open(@out_path, 'w')
     $stdout = @output
 
     Rex::Application.new(
       pattern:      pattern,
-      input:        ARGF,
+      input:        Rex::Input[@inp_path],
       user_options: TEST_DEFAULTS.merge(opts)
     ).report!
 
@@ -41,12 +41,10 @@ class AppTest < Minitest::Test
     get_app_output_from_file
   end
 
-  # write string we want to test against
   def prepare_input_file(text)
     File.write(@inp_path, text)
   end
 
-  # read output produced by engine
   def get_app_output_from_file
     File.read(@out_path)
   end
@@ -293,7 +291,6 @@ class AppTest < Minitest::Test
     actual = `echo 'def def def' | bin/rex def`
     assert_equal(expected, actual)
   end
-
 
   def teardown
     File.delete(@inp_path) if File.exist?(@inp_path)
