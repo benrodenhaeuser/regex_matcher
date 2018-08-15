@@ -24,7 +24,7 @@ module Rex
       options = {}
 
       option_parser = OptionParser.new do |opts|
-        opts.banner = "Usage: rex [options] pattern input-path [output-path]"
+        opts.banner = "Usage: rex [options] pattern [input]"
 
         opts.on("--disable-line-numbers", "-d", "Disable line numbers") do
           options[:line_numbers] = false
