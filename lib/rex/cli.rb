@@ -17,7 +17,7 @@ module Rex
         user_options: options
       )
 
-      app.run
+      app.report!
     end
 
     def self.parse_options

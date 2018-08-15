@@ -29,7 +29,7 @@ class AppTest < Minitest::Test
       pattern:      pattern,
       input:        ARGF,
       user_options: TEST_DEFAULTS.merge(opts)
-    ).run
+    ).report!
 
     $stdout = STDOUT
     @output.close

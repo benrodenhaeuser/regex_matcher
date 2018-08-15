@@ -18,15 +18,28 @@ module Rex
       @input   = input
       @opts    = DEFAULT_OPTIONS.merge(user_options)
 
-      @engine ||= Engine.new(@pattern, @opts)
+      setup
     end
 
-    def run
-      process_options
-      @input.each { |line| @engine.search(line.chomp).report!(@input, @opts) }
+    def report!
+      @input.each do |line|
+        @engine.search(line.chomp).report!(@input, @opts)
+      end
+    end
+
+    def report
+      @input.each.with_object('') do |line, the_report|
+        line_report = @engine.search(line.chomp).report(@input, @opts)
+        the_report << "#{line_report}\n" unless line_report.nil?
+      end
     end
 
     private
+
+    def setup
+      @engine ||= Engine.new(@pattern, @opts)
+      process_options
+    end
 
     def process_options
       file_list.replace(git_files) if @opts[:git]
@@ -42,7 +55,7 @@ module Rex
     end
 
     def git_files
-      `git ls-tree -r HEAD --name-only`.split("\n")
+      `git ls-files`.split("\n")
     end
   end
 end

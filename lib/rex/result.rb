@@ -9,16 +9,17 @@ module Rex
     end
 
     def report!(input, opts)
-      return if @matches.empty? && !opts[:all_lines]
+      line_report = report(input, opts)
+      puts line_report if line_report
+    end
+
+    def report(input, opts)
+      return nil if @matches.empty? && !opts[:all_lines]
 
       @lineno   = input.file.lineno
       @filename = input.filename
       @opts     = opts
 
-      puts report
-    end
-
-    def report
       @opts[:only_matches] ? only_matches_report : text_with_matches_report
     end
 
@@ -37,7 +38,7 @@ module Rex
         end
       end
       my_report.map!(&:lstrip) unless @opts[:whitespace]
-      my_report
+      my_report.join("\n")
     end
 
     def text_with_matches_report

@@ -1,4 +1,6 @@
 require_relative './named_file.rb'
+require_relative './application.rb'
+
 
 module Rex
   class Input
@@ -13,6 +15,8 @@ module Rex
     end
 
     def each
+      return to_enum(:each) unless block_given?
+
       loop do
         path = files.shift
         break unless path
@@ -30,3 +34,7 @@ module Rex
     end
   end
 end
+
+inp = Rex::Input['./lib/rex/application.rb', './lib/rex/ast.rb']
+val = Rex::Application.new(pattern: 'def', input: inp).report
+puts val
