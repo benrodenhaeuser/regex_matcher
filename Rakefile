@@ -21,7 +21,7 @@ def run_tests
 
   summary = test_files.each_with_object('') do |filename, summary|
     puts headline % { filename: filename}
-    system "#{tests % { filename: filename }}"
+    sh tests % { filename: filename }
     puts
     summary << `#{rex % { filename: filename, regex: regex }}`
   end
