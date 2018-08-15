@@ -35,8 +35,6 @@ module Rex
       }
     end
 
-    private_class_method :parse_arguments
-
     def self.handle_sigint
       trap "SIGINT" do
         puts; puts "Good-bye"
@@ -45,5 +43,7 @@ module Rex
     end
 
     private_class_method :handle_sigint
+    private_class_method :parse_arguments
+    private_class_method :parse_options
   end
 end
