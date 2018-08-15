@@ -3,11 +3,20 @@ require 'minitest/autorun'
 require_relative '../lib/rex_cli/parser.rb'
 
 class TokenizerText < Minitest::Test
-  def test_escaped_star_is_tokenized_as_char
-    tokenizer = Rex::Tokenizer.new('\*')
-    actual = tokenizer.next_token.type
+  def tokenize_escaped_char
+    tokenizer = Rex::Tokenizer.new('\(')
+    token = tokenizer.next_token
+    actual = token.type
     expected = Rex::Tokenizer::CHAR
     assert_equal(expected, actual)
+    actual = token.text
+    expected = '('
+    assert_equal(expected, actual)
+  end
+
+  def test_cannot_escape_ordinary_literal
+    tokenizer = Rex::Tokenizer.new('\a')
+    assert_raises(TokenError) { tokenizer.next_token }
   end
 
   def test_end_of_input_is_tokenized_as_eof_token
@@ -18,17 +27,6 @@ class TokenizerText < Minitest::Test
     assert_equal(expected, actual)
     # still eof after another read:
     actual = tokenizer.next_token.type
-    assert_equal(expected, actual)
-  end
-
-  def tokenize_esaped_char
-    tokenizer = Rex::Tokenizer.new('\(')
-    token = tokenizer.next_token
-    actual = token.type
-    expected = Rex::Tokenizer::CHAR
-    assert_equal(expected, actual)
-    actual = token.text
-    expected = '('
     assert_equal(expected, actual)
   end
 end

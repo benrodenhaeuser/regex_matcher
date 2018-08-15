@@ -6,6 +6,8 @@ module Rex
   ESCAPED = %w(* + ( ) ? . |)
   # ^ Characters that need to be preceded with backslash to be used as literals
 
+  class TokenError < RuntimeError; end
+
   class Tokenizer
     EOF        = -1
     START_TYPE = 0
@@ -48,10 +50,14 @@ module Rex
           Token.new(DOT, @cursor)
         when BACKSLASH
           consume
-          raise "illegal char #{@cursor}" unless ESCAPED.include?(@cursor)
+          unless ESCAPED.include?(@cursor)
+            raise TokenError, "illegal: #{@cursor}"
+          end
           Token.new(CHAR, @cursor)
         else
-          raise "illegal char #{@cursor}" unless ALPHABET.include?(@cursor)
+          unless ALPHABET.include?(@cursor)
+            raise TokenError, "illegal: #{@cursor}"
+          end
           Token.new(CHAR, @cursor)
         end
 
