@@ -13,6 +13,14 @@ module Rex
       consume
     end
 
+    def parse
+      ast = expression
+      raise(RegexError, 'Expected end of stream') unless eof?
+      ast
+    end
+
+    private
+
     def match(expected_type)
       return consume if lookahead.type == expected_type
       raise RegexError, "Expected #{expected_type}, saw #{lookahead.type}"
@@ -24,12 +32,6 @@ module Rex
 
     def eof?
       lookahead.type == Tokenizer::EOF_TYPE
-    end
-
-    def parse
-      ast = expression
-      raise(RegexError, 'Expected end of stream') unless eof?
-      ast
     end
 
     def expression
