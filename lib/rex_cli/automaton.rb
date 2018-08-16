@@ -26,7 +26,6 @@ module Rex
       set = @current.moves[char]
       raise AutomatonError, "Not available: #{char}" unless set
       raise AutomatonError, "Nondeterministic: #{char}" unless set.singleton?
-
       @current = set.element
     end
 
@@ -41,7 +40,6 @@ module Rex
 
     def to_s
       states.each.with_index { |state, index| state.label = "q#{index}" }
-
       transitions = states.map(&:collect_transitions).compact.join("\n")
 
       "states: #{states}\n" \

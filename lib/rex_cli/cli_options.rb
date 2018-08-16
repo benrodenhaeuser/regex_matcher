@@ -6,18 +6,21 @@ module Rex
       Usage: rex [options] pattern [file ...]
 
       Defaults:
-          - prints line numbers (unless reading input from stdin)
-          - finds multiple matches per line ('global' matching)
-          - prints lines containing matches only
-          - prints whole lines (rather than only matching segments)
-          - strips leading whitespace
-          - highlights matches (if printing to terminal)
-          - shows file names (unless searching single file)
+          - prints line numbers (if reading input from a file)
+          - finds multiple matches per line
+          - prints match-containing lines only
+          - prints whole lines (rather than only matches)
+          - strips leading whitespace from lines
+          - visually highlights matches (if printing to terminal)
+          - shows file names (if searching multiple files)
 
       Notes:
           - use `rex --git pattern` to search files under git source control
-          - use `rex [options] pattern` to have rex read from stdin
-          - append `> file` to your command to have rex write output to file
+          - as usual:
+            - `rex [options] pattern` will have rex read from stdin
+            - `cmd | rex ...` will pipe cmd output to rex input
+            - `rex ... | cmd` will pipe rex output to cmd input
+            - `rex ... > file` will write rex output to file
 
       Options:
     HEREDOC
@@ -76,7 +79,6 @@ module Rex
       end
 
       option_parser.parse!
-
       options
     end
   end

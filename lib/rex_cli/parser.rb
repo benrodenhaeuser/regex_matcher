@@ -41,20 +41,13 @@ module Rex
         match(Tokenizer::ALTERNATE)
         right_ast = expression
       end
-
       return left_ast unless right_ast
       AST.new(root: token, left: left_ast, right: right_ast)
     end
 
     def term
       ast = factor
-
-      factor_first = [
-        Tokenizer::CHAR,
-        Tokenizer::DOT,
-        Tokenizer::LPAREN
-      ]
-
+      factor_first = [Tokenizer::CHAR, Tokenizer::DOT, Tokenizer::LPAREN]
       return ast unless factor_first.include?(lookahead.type)
       token = Token.new(Tokenizer::CONCAT, '')
       AST.new(root: token, left: ast, right: term)
@@ -77,14 +70,8 @@ module Rex
     end
 
     def base
-      atomic_expressions = [
-        Tokenizer::CHAR,
-        Tokenizer::DOT
-      ]
-
       type = lookahead.type
-
-      if atomic_expressions.include?(type)
+      if [Tokenizer::CHAR, Tokenizer::DOT].include?(type)
         atom
       elsif type == Tokenizer::LPAREN
         match(Tokenizer::LPAREN)

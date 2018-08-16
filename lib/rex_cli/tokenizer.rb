@@ -4,7 +4,7 @@ module Rex
   #   see https://en.wikipedia.org/wiki/List_of_Unicode_characters#Basic_Latin
 
   ESCAPED = %w(* + ( ) ? . |)
-  # ^ Characters that need to be preceded with backslash to be used as literals
+  # ^ Characters that need to be preceded with backslash for use as literals
 
   class TokenError < RuntimeError; end
 
