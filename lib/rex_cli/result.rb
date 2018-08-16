@@ -51,7 +51,7 @@ module Rex
     end
 
     def prefix(match = nil)
-      file = @opts[:filename]                             ? @filename      : nil
+      file = @opts[:file_names]                           ? @filename      : nil
       row  = @opts[:line_numbers] && @filename != '-'     ? @lineno        : nil
       col  = @opts[:only_matches] && @opts[:line_numbers] ? match.from + 1 : nil
 
