@@ -6,7 +6,7 @@ module Rex
       Usage: rex [options] pattern [file ...]
 
       Defaults:
-          - prints line numbers (unless reading from stdin)
+          - prints line numbers (unless reading input from stdin)
           - finds multiple matches per line ('global' matching)
           - prints lines containing matches only
           - prints whole lines (rather than only matching segments)
@@ -15,12 +15,9 @@ module Rex
           - shows file names (unless searching single file)
 
       Notes:
-          - use `rex --git pattern` to search files under source control
-          - rex supports piping:
-            - use `rex [options] pattern` (without file argument) to have rex
-              read from stdin
-            - append `> file` to your command to have rex write output to file
-            - use pipes (`|`) in the usual way  
+          - use `rex --git pattern` to search files under git source control
+          - use `rex [options] pattern` to have rex read from stdin
+          - append `> file` to your command to have rex write output to file
 
       Options:
     HEREDOC
