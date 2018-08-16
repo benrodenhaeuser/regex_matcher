@@ -4,6 +4,8 @@ require_relative './thompson.rb'
 require_relative './dfa.rb'
 
 module Rex
+  class AutomatonError < RuntimeError; end
+
   class Automaton
     include Thompson
     include DFA
@@ -21,9 +23,9 @@ module Rex
     end
 
     def step!(char)
-      char_neighbors = @current.moves[char]
-      raise "Not available: #{char}" unless char_neighbors
-      raise "Nondeterministic step: #{char}" unless char_neighbors.singleton?
+      set = @current.moves[char]
+      raise AutomatonError, "Not available: #{char}" unless set
+      raise AutomatonError, "Nondeterministic: #{char}" unless set.singleton?
 
       @current = @current.moves[char].elem
     end
