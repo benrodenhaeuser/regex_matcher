@@ -27,7 +27,7 @@ module Rex
       raise AutomatonError, "Not available: #{char}" unless set
       raise AutomatonError, "Nondeterministic: #{char}" unless set.singleton?
 
-      @current = @current.moves[char].elem
+      @current = set.element
     end
 
     def terminal?

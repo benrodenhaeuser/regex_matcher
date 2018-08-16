@@ -1,12 +1,14 @@
 require 'set'
 
+class SetError < RuntimeError; end
+
 class Set
   def singleton?
     size == 1
   end
 
-  def elem
-    raise 'Not a singleton!' unless singleton?
+  def element
+    raise SetError, 'Not a singleton!' unless singleton?
     to_a.first
   end
 
