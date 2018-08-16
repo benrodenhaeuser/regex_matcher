@@ -16,7 +16,7 @@ class TokenizerText < Minitest::Test
 
   def test_cannot_escape_ordinary_literal
     tokenizer = Rex::Tokenizer.new('\a')
-    assert_raises(TokenError) { tokenizer.next_token }
+    assert_raises(Rex::TokenError) { tokenizer.next_token }
   end
 
   def test_end_of_input_is_tokenized_as_eof_token
