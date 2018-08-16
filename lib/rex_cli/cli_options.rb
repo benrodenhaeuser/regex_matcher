@@ -3,24 +3,24 @@ module Rex
     BANNER = <<~HEREDOC
       rex prints lines that contain a match for a pattern (like grep).
 
-      Usage: rex [options] pattern [file(s)]
+      Usage: rex [options] pattern [file ...]
 
       Defaults:
-          - prints line numbers
+          - prints line numbers (unless reading from stdin)
           - finds multiple matches per line ('global' matching)
-          - prints lines with matches only
+          - prints lines containing matches only
           - prints whole lines (rather than only matching segments)
           - strips leading whitespace
-          - highlights matches, but only if printing to terminal
-          - shows file names, but only if searching multiple files
+          - highlights matches (if printing to terminal)
+          - shows file names (unless searching single file)
 
       Notes:
           - use `rex --git pattern` to search files under source control
-          - rex supports piping just like standard command line tools:
+          - rex supports piping:
             - use `rex [options] pattern` (without file argument) to have rex
               read from stdin
             - append `> file` to your command to have rex write output to file
-            - use pipes (`|`) in the usual way
+            - use pipes (`|`) in the usual way  
 
       Options:
     HEREDOC

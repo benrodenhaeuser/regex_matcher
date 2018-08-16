@@ -37,7 +37,7 @@ module Rex
     private
 
     def setup
-      @engine ||= Engine.new(@pattern, @opts)
+      @engine = Engine.new(@pattern, @opts)
       process_options
     end
 
