@@ -4,6 +4,7 @@ require_relative '../lib/rex_cli/parser.rb'
 
 class TokenizerText < Minitest::Test
   def tokenize_escaped_char
+    # skip
     tokenizer = Rex::Tokenizer.new('\(')
     token = tokenizer.next_token
     actual = token.type
@@ -15,11 +16,13 @@ class TokenizerText < Minitest::Test
   end
 
   def test_cannot_escape_ordinary_literal
+    # skip
     tokenizer = Rex::Tokenizer.new('\a')
     assert_raises(Rex::TokenError) { tokenizer.next_token }
   end
 
   def test_end_of_input_is_tokenized_as_eof_token
+    # skip
     tokenizer = Rex::Tokenizer.new('a')
     tokenizer.next_token # process 'a'
     actual = tokenizer.next_token.type
@@ -33,21 +36,25 @@ end
 
 class ParserTest < Minitest::Test
   def test_unbalanced_parentheses_raise_exception1
+    # skip
     parser = Rex::Parser.new("(a|b|(c|d)")
     assert_raises(Rex::RegexError) { parser.parse }
   end
 
   def test_unbalanced_parentheses_raise_exception2
+    # skip
     parser = Rex::Parser.new("a)")
     assert_raises(Rex::RegexError) { parser.parse }
   end
 
   def test_empty_subexpression_raises_exception1
+    # skip
     parser = Rex::Parser.new("a|")
     assert_raises(Rex::RegexError) { parser.parse }
   end
 
   def test_empty_subexpression_raises_exception2
+    # skip
     parser = Rex::Parser.new("(*)|ab")
     assert_raises(Rex::RegexError) { parser.parse }
   end

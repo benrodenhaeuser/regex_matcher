@@ -1,9 +1,9 @@
 require_relative 'lib/rex_cli/highlighted_string'
 require 'bundler/gem_tasks'
 
-# runs all files in `test` directory whose name includes `test`
-# minitest output is logged to `test/reports`
-# displays a summary report after all tests have run
+# - runs all test files in `test`
+# - logs minitest output to `test/reports`
+# - prints per file summary (failures/errors/skips) at the end
 desc 'Run all tests'
 task :test do
   run_tests
@@ -19,8 +19,14 @@ def run_tests
   run = "ruby #{test_path} | tee #{report_path}.txt"
   exp =
     "(0|1|2|3|4|5|6|7|8|9)* failures, " +
-    "(0|1|2|3|4|5|6|7|8|9)* errors"
-  res = "rex -fdh '%{exp}' ./#{report_path}.txt"
+    "(0|1|2|3|4|5|6|7|8|9)* errors, " +
+    "(0|1|2|3|4|5|6|7|8|9)* skips"
+
+  res = "rex -dhm '%{exp}' ./#{report_path}.txt"
+  # ^ rex options selected:
+  # -d option to disable line numbers
+  # -h option to disable line numbers
+  # -m option to enable 'only matches' output
 
   summary = test_files.each_with_object('') do |fn, summary|
     puts headline % { fn: fn}

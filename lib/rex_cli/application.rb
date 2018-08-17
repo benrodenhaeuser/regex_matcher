@@ -9,7 +9,8 @@ module Rex
       all_lines:     false, # -a to enable all lines output
       only_matches:  false, # -m to enable only matches output
       whitespace:    false, # -w to prevent lstrip
-      highlight:     :auto, # -h to enforce highlighting
+      highlight:     :auto, # -H to enforce highlighting,
+                            # -h to disable highlighting
       file_names:    nil    # -f to enforce file name printing
     }.freeze
 

@@ -61,9 +61,14 @@ module Rex
           options[:whitespace] = true
         end
 
-        opts.on("--highlight", "-h",
+        opts.on("--highlight", "-H",
                 "Enforce *h*ighlighting") do
           options[:highlight] = true
+        end
+
+        opts.on("--nohighlight", "-h",
+                "Disable *h*ighlighting") do
+          options[:highlight] = false
         end
 
         opts.on("--file-names", "-f",
