@@ -26,7 +26,7 @@ class ApplicationTest < Minitest::Test
       pattern:      pattern,
       input:        Rex::Input[@inp_path],
       user_options: TEST_DEFAULTS.merge(opts)
-    ).report!
+    ).run!
   end
 
   def test_concatenation_of_literals

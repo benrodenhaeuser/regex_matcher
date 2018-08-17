@@ -25,7 +25,7 @@ module Rex
         user_options: options
       )
 
-      app.report!
+      app.run!
     end
 
     def self.parse_arguments

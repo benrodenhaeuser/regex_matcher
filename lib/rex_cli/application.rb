@@ -21,13 +21,13 @@ module Rex
       setup
     end
 
-    def report!
+    def run!
       @input.each do |line|
         @engine.search(line.chomp).report!(@input, @opts)
       end
     end
 
-    def report
+    def run
       @input.each.with_object('') do |line, the_report|
         line_report = @engine.search(line.chomp).report(@input, @opts)
         the_report << "#{line_report}\n" unless line_report.nil?
