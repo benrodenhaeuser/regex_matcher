@@ -28,12 +28,13 @@ module Rex
       end
     end
 
-    def run
-      @input.each.with_object('') do |line, the_report|
-        line_report = @engine.search(line.chomp).report(@input, @opts)
-        the_report << "#{line_report}\n" unless line_report.nil?
-      end
-    end
+    # TODO: do we even want this?
+    # def run
+    #   @input.each.with_object('') do |line, the_report|
+    #     line_report = @engine.search(line.chomp).report(@input, @opts)
+    #     the_report << "#{line_report}\n" unless line_report.nil?
+    #   end
+    # end
 
     private
 
@@ -43,16 +44,21 @@ module Rex
     end
 
     def process_options
-      file_list.replace(git_files) if @opts[:git]
-      @opts[:file_names] ||= no_of_files > 1
+      paths.replace(git_files) if @opts[:git]
+      @opts[:file_names] ||= no_of_paths > 1
+      # TODO: this might be a problem if allow directory paths here ...
+      # how are we going to know whether we have several files, or just one?
+      # solution: if we have several paths, or we are doing a git or dir
+      # search, then we want file names (even though there is an edge case
+      # where we are still searching only one file).
     end
 
-    def no_of_files
-      @input.files.length
+    def no_of_paths
+      @input.paths.length
     end
 
-    def file_list
-      @input.files
+    def paths
+      @input.paths
     end
 
     def git_files

@@ -15,8 +15,8 @@ module Rex
     def report(input, opts)
       return nil if @matches.empty? && !opts[:all_lines]
 
-      @lineno   = input.file.lineno
-      @filename = input.filename
+      @lineno   = input.current_file.lineno
+      @filename = input.current_file.path
       @opts     = opts
 
       @opts[:only_matches] ? only_matches_report : text_with_matches_report
@@ -52,7 +52,8 @@ module Rex
 
     def prefix(match = nil)
       file = @opts[:file_names]                           ? @filename      : nil
-      row  = @opts[:line_numbers] && @filename != '-'     ? @lineno        : nil
+      # TODO: fix formatting
+      row  = @opts[:line_numbers] && @filename != '/dev/stdin'     ? @lineno        : nil
       col  = @opts[:only_matches] && @opts[:line_numbers] ? match.from + 1 : nil
 
       the_prefix = [file, row, col].compact.join(':')
