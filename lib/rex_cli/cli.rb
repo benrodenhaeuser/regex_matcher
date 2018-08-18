@@ -15,7 +15,7 @@ module Rex
       ARGV << '--help' if ARGV.empty?
 
       options   = parse_options
-      arguments = parse_arguments
+      arguments = parse_arguments(options)
 
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
@@ -28,10 +28,10 @@ module Rex
       app.run!
     end
 
-    def self.parse_arguments
+    def self.parse_arguments(options)
       {
         pattern: ARGV.shift,
-        input:   Input[*ARGV]
+        input:   Input.new(ARGV, options)
       }
     end
 

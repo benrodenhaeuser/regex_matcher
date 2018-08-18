@@ -39,6 +39,11 @@ module Rex
         opts.on("--git", "-g",
                 "Search current *g*it repository") do
           options[:git] = true
+
+          unless system("git rev-parse 2> nul") == true
+            puts 'Not a git repository!'
+            exit
+          end
         end
 
         opts.on("--one-match", "-o",

@@ -5,6 +5,7 @@ module Rex
     DEFAULT_OPTIONS = {     # CLI options cheatsheet:
       line_numbers:  true,  # -d to disable line numbers
       git:           false, # -g to enable git search
+      recursive:     false, # -r to enable recursive search
       global:        true,  # -o to enable one match per line
       all_lines:     false, # -a to enable all lines output
       only_matches:  false, # -m to enable only matches output
@@ -28,14 +29,6 @@ module Rex
       end
     end
 
-    # TODO: do we even want this?
-    # def run
-    #   @input.each.with_object('') do |line, the_report|
-    #     line_report = @engine.search(line.chomp).report(@input, @opts)
-    #     the_report << "#{line_report}\n" unless line_report.nil?
-    #   end
-    # end
-
     private
 
     def setup
@@ -44,14 +37,8 @@ module Rex
     end
 
     def process_options
-      paths.replace(['.']) if @opts[:recursive]
-      paths.replace(git_files) if @opts[:git] # TODO: see comment below in `git_files`
-      @opts[:file_names] ||= no_of_paths > 1
-      # TODO: this might be a problem if we allow directory paths here ...
-      # how are we going to know whether we have several files, or just one?
-      # solution: if we have several paths, or we are doing a git or dir
-      # search, then we want file names (even though there is an edge case
-      # where we are still searching only one file).
+      paths.replace(['.']) if @opts[:recursive] || @opts[:git]
+      @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive] || @opts[:git]
     end
 
     def no_of_paths
@@ -60,12 +47,6 @@ module Rex
 
     def paths
       @input.paths
-    end
-
-    # TODO: I think we want to push this to the Input class, i.e., Input#each
-    # should simply enumerate the appropriate files if git option is chosen
-    def git_files
-      `git ls-files`.split("\n")
     end
   end
 end

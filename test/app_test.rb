@@ -22,10 +22,12 @@ class ApplicationTest < Minitest::Test
   def run_app!(pattern:, text: ,opts: {})
     File.write(@inp_path, text)
 
+    options = TEST_DEFAULTS.merge(opts)
+
     Rex::Application.new(
       pattern:      pattern,
-      input:        Rex::Input[@inp_path],
-      user_options: TEST_DEFAULTS.merge(opts)
+      input:        Rex::Input.new([@inp_path], options),
+      user_options: options
     ).run!
   end
 
