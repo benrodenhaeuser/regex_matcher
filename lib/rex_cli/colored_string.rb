@@ -24,7 +24,7 @@ class String
     red.underline
   end
 
-  def highlight(style)
+  def color(style)
     send(style)
   end
 end

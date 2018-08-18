@@ -9,8 +9,10 @@ module Rex
     attr_reader :current_file
 
     def initialize(paths, options)
-      @paths = paths.empty? ? [STDIN_PATH] : paths
+      @paths = paths
       @options = options
+
+      paths << STDIN_PATH if paths.empty?
     end
 
     def each
@@ -26,12 +28,9 @@ module Rex
             next
           end
         else
-          if @options[:git] && !`git check-ignore #{path}`.empty?
-            Find.prune
-          else
-            @current_file = File.open(path, 'r')
-            @current_file.each { |line| yield line }
-          end
+          @current_file = File.open(path, 'r')
+          @current_file.each { |line| yield line }
+          @current_file.close
         end
       end
     end

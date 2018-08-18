@@ -1,4 +1,4 @@
-require_relative './highlighted_string.rb'
+require_relative './colored_string.rb'
 
 module Rex
   class Result
@@ -26,11 +26,11 @@ module Rex
 
     def only_matches_report
       the_matches = @matches.map do |match|
-        highlight(@text[match.from...match.to], :red_underline)
+        color(@text[match.from...match.to], :red_underline)
       end
 
       the_prefixes = @matches.map do |match|
-        highlight(prefix(match), :dim)
+        color(prefix(match), :dim)
       end
 
       the_prefixes.zip(the_matches).map(&:join).join("\n")
@@ -42,31 +42,42 @@ module Rex
         the_match  = text[match.from...match.to]
         post_match = text[match.to...text.length]
 
-        pre_match + highlight(the_match, :red_underline) + post_match
+        pre_match + color(the_match, :red_underline) + post_match
       end
 
       the_line.lstrip! unless @opts[:whitespace]
 
-      highlight(prefix, :dim) + the_line
+      color(prefix, :dim) + the_line
     end
 
     def prefix(match = nil)
-      file = @opts[:file_names] ? @path : nil
-      row  = @opts[:line_numbers] && @path != Input::STDIN_PATH ? @lineno : nil
+      filename = @opts[:file_names] ? format_path(@path) : nil
       col  = @opts[:only_matches] && @opts[:line_numbers] ? match.from + 1 : nil
 
-      the_prefix = [file, row, col].compact.join(':')
+      row =
+        case @opts[:line_numbers]
+        when true then @lineno
+        when false then nil
+        else
+          @path != Input::STDIN_PATH ? @lineno : nil
+        end
+
+      the_prefix = [filename, row, col].compact.join(':')
       the_prefix.empty? ? the_prefix : the_prefix + ': '
     end
 
-    def highlight(text, style)
+    def format_path(path)
+      path[0..1] == './' ? path[2...path.length] : path
+    end
+
+    def color(text, style)
       return text if text.empty?
 
-      case @opts[:highlight]
-      when true then text.highlight(style)
+      case @opts[:color]
+      when true then text.color(style)
       when false then text
       else
-        $stdout.isatty ? text.highlight(style) : text
+        $stdout.isatty ? text.color(style) : text
       end
     end
   end

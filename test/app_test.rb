@@ -8,7 +8,7 @@ TEST_DEFAULTS = {
   global:       true,
   all_lines:    false,
   only_matches: true,
-  highlight:    false
+  color:    false
 }.freeze
 
 class ApplicationTest < Minitest::Test
@@ -252,9 +252,9 @@ class ApplicationTest < Minitest::Test
     }
   end
 
-  def test_highlighting_on
+  def test_coloring_on
     # skip
-    options = { highlight: true }
+    options = { color: true }
     expected = "\e[4m\e[31mtest\e[0m\e[0m\n"
     # ^ to verify this is what we need:
     # `$ echo -e "\e[4m\e[31mtest\e[0m\e[0m\n"`
@@ -269,10 +269,10 @@ class ApplicationTest < Minitest::Test
     }
   end
 
-  def test_highlighting_on2
+  def test_coloring_on2
     # skip
     options = {
-      highlight: true,
+      color: true,
       only_matches: false
     }
     expected = "somestuffand\e[4m\e[31mtest\e[0m\e[0mandmorestuff\n"

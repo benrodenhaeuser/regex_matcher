@@ -1,4 +1,4 @@
-require_relative 'lib/rex_cli/highlighted_string'
+require_relative 'lib/rex_cli/colored_string'
 require 'bundler/gem_tasks'
 
 # - runs all test files in `test`
@@ -15,18 +15,14 @@ def run_tests
   test_path = "test/%{fn}"
   report_path = "test/reports/%{fn}"
 
-  headline = ">>> #{test_path}".highlight(:red)
+  headline = ">>> #{test_path}".color(:red)
   run = "ruby #{test_path} | tee #{report_path}.txt"
   exp =
     "(0|1|2|3|4|5|6|7|8|9)* failures, " +
     "(0|1|2|3|4|5|6|7|8|9)* errors, " +
     "(0|1|2|3|4|5|6|7|8|9)* skips"
 
-  res = "rex -dhm '%{exp}' ./#{report_path}.txt"
-  # ^ rex options selected:
-  # -d option to disable line numbers
-  # -h option to disable line numbers
-  # -m option to enable 'only matches' output
+  res = "bin/rex --line-number off --color off -o '%{exp}' ./#{report_path}.txt"
 
   summary = test_files.each_with_object('') do |fn, summary|
     puts headline % { fn: fn}
@@ -36,7 +32,7 @@ def run_tests
     summary << "#{fn}: " + `#{res % { fn: fn, exp: exp }}`
   end
 
-  puts ">>> summary".highlight(:red)
+  puts ">>> summary".color(:red)
   puts summary
 end
 

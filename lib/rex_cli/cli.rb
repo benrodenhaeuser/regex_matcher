@@ -10,7 +10,7 @@ module Rex
     extend CliOptions
 
     def self.run
-      handle_sigint
+      trap_sigint
 
       ARGV << '--help' if ARGV.empty?
 
@@ -35,14 +35,14 @@ module Rex
       }
     end
 
-    def self.handle_sigint
+    def self.trap_sigint
       trap "SIGINT" do
         puts; puts "Good-bye"
         exit!
       end
     end
 
-    private_class_method :handle_sigint
+    private_class_method :trap_sigint
     private_class_method :parse_arguments
     private_class_method :parse_options
   end

@@ -2,17 +2,16 @@ require_relative './engine.rb'
 
 module Rex
   class Application
-    DEFAULT_OPTIONS = {     # CLI options cheatsheet:
-      line_numbers:  true,  # -d to disable line numbers
-      git:           false, # -g to enable git search
-      recursive:     false, # -r to enable recursive search
-      global:        true,  # -o to enable one match per line
-      all_lines:     false, # -a to enable all lines output
-      only_matches:  false, # -m to enable only matches output
-      whitespace:    false, # -w to prevent lstrip
-      highlight:     :auto, # -H to enforce highlighting,
-                            # -h to disable highlighting
-      file_names:    nil    # -f to enforce file name printing
+    DEFAULT_OPTIONS = {     # corresponding CLI option:
+      git:           false, # `-g`
+      recursive:     false, # `-r`
+      global:        true,  # `-s`
+      all_lines:     false, # `-a`
+      only_matches:  false, # `-o`
+      whitespace:    false, # `-w`
+      line_numbers:  nil,   # `-l ARG`
+      color:         nil,   # `-c ARG`
+      file_names:    nil    # `-f ARG`
     }.freeze
 
     def initialize(pattern:, input:, user_options: {})
@@ -20,7 +19,10 @@ module Rex
       @input   = input
       @opts    = DEFAULT_OPTIONS.merge(user_options)
 
-      setup
+      @engine = Engine.new(@pattern, @opts)
+      file_paths.replace(['.']) if @opts[:recursive]
+      file_paths.replace(git_files) if @opts[:git]
+      @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive] || @opts[:git]
     end
 
     def run!
@@ -31,22 +33,16 @@ module Rex
 
     private
 
-    def setup
-      @engine = Engine.new(@pattern, @opts)
-      process_options
-    end
-
-    def process_options
-      paths.replace(['.']) if @opts[:recursive] || @opts[:git]
-      @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive] || @opts[:git]
-    end
-
     def no_of_paths
       @input.paths.length
     end
 
-    def paths
+    def file_paths
       @input.paths
+    end
+
+    def git_files
+      `git ls-files`.chomp.split("\n")
     end
   end
 end
