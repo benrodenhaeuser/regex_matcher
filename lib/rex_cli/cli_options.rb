@@ -40,7 +40,7 @@ module Rex
                 "Search current *g*it repository") do
           options[:git] = true
 
-          unless system("git rev-parse 2> nul") == true
+          unless system("git rev-parse 2>/dev/null") == true
             puts 'Not a git repository!'
             exit
           end

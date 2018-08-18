@@ -20,7 +20,7 @@ module Rex
         absolute_path = File.expand_path(path)
 
         if FileTest.directory?(path)
-          if File.basename(absolute_path)[0] == '.' # dot-directory
+          if File.basename(absolute_path)[0] == '.'
             Find.prune
           else
             next
