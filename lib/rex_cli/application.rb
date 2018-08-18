@@ -44,9 +44,10 @@ module Rex
     end
 
     def process_options
-      paths.replace(git_files) if @opts[:git]
+      paths.replace(['.']) if @opts[:recursive]
+      paths.replace(git_files) if @opts[:git] # TODO: see comment below in `git_files`
       @opts[:file_names] ||= no_of_paths > 1
-      # TODO: this might be a problem if allow directory paths here ...
+      # TODO: this might be a problem if we allow directory paths here ...
       # how are we going to know whether we have several files, or just one?
       # solution: if we have several paths, or we are doing a git or dir
       # search, then we want file names (even though there is an edge case
@@ -61,6 +62,8 @@ module Rex
       @input.paths
     end
 
+    # TODO: I think we want to push this to the Input class, i.e., Input#each
+    # should simply enumerate the appropriate files if git option is chosen
     def git_files
       `git ls-files`.split("\n")
     end

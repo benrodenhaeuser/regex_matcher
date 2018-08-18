@@ -76,6 +76,10 @@ module Rex
           options[:file_names] = true
         end
 
+        opts.on("--recursive", "-r", "recursive search") do
+          options[:recursive] = true
+        end
+
         opts.on_tail("--help",
                      "Help (this message)") do
           puts opts

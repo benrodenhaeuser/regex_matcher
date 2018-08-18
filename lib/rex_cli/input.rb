@@ -1,8 +1,10 @@
-require_relative './named_file.rb'
 require_relative './application.rb'
+require 'find'
 
 module Rex
   class Input
+    STDIN_PATH = '/dev/stdin'.freeze
+
     def self.[](*paths)
       new(paths)
     end
@@ -11,27 +13,26 @@ module Rex
     attr_reader :current_file
 
     def initialize(paths)
-      # TODO: make '/dev/stdin' a constant
-      @paths = paths.empty? ? ['/dev/stdin'] : paths
+      @paths = paths.empty? ? [STDIN_PATH] : paths
     end
 
     def each
       return to_enum(:each) unless block_given?
 
-      loop do
-        path = paths.shift
-        @current_file = File.open(path, 'r')
-        @current_file.each { |line| yield line }
-        break if paths.empty?
+      Find.find(*paths) do |path|
+        full_path = File.expand_path(path)
+
+        if FileTest.directory?(path)
+          if File.basename(full_path)[0] == '.'
+            Find.prune
+          else
+            next
+          end
+        else
+          @current_file = File.open(path, 'r')
+          @current_file.each { |line| yield line }
+        end
       end
     end
-
-    # def filename
-    #   @current.path
-    # end
-
-    # def file
-    #   @current.file
-    # end
   end
 end
