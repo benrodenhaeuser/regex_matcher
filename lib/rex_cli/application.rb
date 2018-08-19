@@ -43,7 +43,7 @@ module Rex
     end
 
     def git_files
-      `git ls-files`.chomp.split("\n")
+      `git ls-files`.lines.map(&:chomp)
     end
   end
 end
