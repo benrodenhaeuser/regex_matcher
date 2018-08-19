@@ -20,18 +20,14 @@ module Rex
 
       Find.find(*paths) do |path|
         absolute_path = File.expand_path(path)
+        first_letter = File.basename(absolute_path)[0]
+        Find.prune if first_letter == '.' && @options[:skip_dot_files]
 
-        if FileTest.directory?(path)
-          if File.basename(absolute_path)[0] == '.'
-            Find.prune
-          else
-            next
-          end
-        else
-          @current_file = File.open(path, 'r')
-          @current_file.each { |line| yield line }
-          @current_file.close
-        end
+        next if FileTest.directory?(path)
+
+        @current_file = File.open(path, 'r')
+        @current_file.each { |line| yield line }
+        @current_file.close
       end
     end
   end
