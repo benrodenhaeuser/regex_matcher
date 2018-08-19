@@ -10,7 +10,7 @@ module Rex
 
     def initialize(paths, options)
       @paths = paths
-      @options = options
+      @opts = options
 
       paths << STDIN_PATH if paths.empty?
     end
@@ -21,7 +21,7 @@ module Rex
       Find.find(*paths) do |path|
         absolute_path = File.expand_path(path)
         first_letter = File.basename(absolute_path)[0]
-        if first_letter == '.' && @options[:skip_dot_files]
+        if first_letter == '.' && @opts[:skip_dot_files]
           Find.prune
         end
 
