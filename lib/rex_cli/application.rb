@@ -2,23 +2,10 @@ require_relative './engine.rb'
 
 module Rex
   class Application
-    DEFAULT_OPTIONS = {     # corresponding CLI option:
-      git:            false, # `-g`
-      recursive:      false, # `-r`
-      global:         true,  # `-s`
-      all_lines:      false, # `-a`
-      only_matches:   false, # `-o`
-      whitespace:     false, # `-w`
-      skip_dot_files: true, # (not configurable)
-      line_numbers:   nil,   # `-l ARG`
-      color:          nil,   # `-c ARG`
-      file_names:     nil    # `-f ARG`
-    }.freeze
-
-    def initialize(pattern:, input:, user_options: {})
+    def initialize(pattern:, input:, options:)
       @pattern = pattern
       @input   = input
-      @opts    = DEFAULT_OPTIONS.merge(user_options)
+      @opts    = options
 
       @engine = Engine.new(@pattern, @opts)
       file_paths.replace(['.']) if @opts[:recursive]

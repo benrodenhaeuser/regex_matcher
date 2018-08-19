@@ -25,9 +25,9 @@ class ApplicationTest < Minitest::Test
     options = TEST_DEFAULTS.merge(opts)
 
     Rex::Application.new(
-      pattern:      pattern,
-      input:        Rex::Input.new([@inp_path], options),
-      user_options: options
+      pattern: pattern,
+      input:   Rex::Input.new([@inp_path], options),
+      options: options
     ).run!
   end
 

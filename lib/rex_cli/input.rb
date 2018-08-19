@@ -21,7 +21,10 @@ module Rex
       Find.find(*paths) do |path|
         absolute_path = File.expand_path(path)
         first_letter = File.basename(absolute_path)[0]
-        Find.prune if first_letter == '.' && @options[:skip_dot_files]
+        if first_letter == '.' && @options[:skip_dot_files]
+          puts "I AM HERE"
+          Find.prune
+        end
 
         next if FileTest.directory?(path)
 
