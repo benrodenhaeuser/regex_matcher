@@ -14,15 +14,15 @@ module Rex
 
       ARGV << '--help' if ARGV.empty?
 
-      options   = parse_options
+      options = parse_options
       arguments = parse_arguments(options)
 
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
       app = Application.new(
-        pattern:      arguments[:pattern],
-        input:        arguments[:input],
-        options: Options::DEFAULT_OPTIONS.merge(options)
+        pattern: arguments[:pattern],
+        input:   arguments[:input],
+        options: options
       )
 
       app.run!

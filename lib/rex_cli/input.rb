@@ -22,7 +22,6 @@ module Rex
         absolute_path = File.expand_path(path)
         first_letter = File.basename(absolute_path)[0]
         if first_letter == '.' && @options[:skip_dot_files]
-          puts "I AM HERE"
           Find.prune
         end
 
