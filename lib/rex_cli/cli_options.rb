@@ -1,7 +1,7 @@
 module Rex
   module CliOptions
     BANNER = <<~HEREDOC
-      rex prints lines matching a pattern.
+      rex finds and prints lines matching a pattern.
 
       Usage: rex [options] pattern [file ...]
 
@@ -17,10 +17,12 @@ module Rex
       Notes:
           - use `--filename`, `--line-number` and `--color` flags to override
             'smart' defaults and enforce uniform behaviour
-          - use `rex --recursive pattern` to recursively search files in pwd
-          - use `rex --git pattern` to recursively search files in pwd under
-            git source control
-          - use `rex [options] pattern` to have rex read from stdin
+          - use `rex --recursive pattern` to recursively search files in current
+            working directory
+          - use `rex --git pattern` to recursively search files in current
+            working directory that are under git source control
+          - use `rex [options] pattern` (omitting the file argument) to enter
+            'interactive' mode, where rex reads from stdin
           - as usual:
             - `cmd | rex ...` will pipe cmd output to rex input
             - `rex ... | cmd` will pipe rex output to cmd input
