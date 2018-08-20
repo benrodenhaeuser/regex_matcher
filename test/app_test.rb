@@ -2,14 +2,7 @@ require 'minitest/autorun'
 
 require_relative '../lib/rex_cli/application.rb'
 require_relative '../lib/rex_cli/input.rb'
-
-TEST_DEFAULTS = {
-  line_numbers: false,
-  global:       true,
-  all_lines:    false,
-  only_matches: true,
-  color:    false
-}.freeze
+require_relative '../lib/rex_cli/defaults.rb'
 
 class ApplicationTest < Minitest::Test
   def setup
@@ -19,56 +12,74 @@ class ApplicationTest < Minitest::Test
     @inp_path = File.join(@data_path, 'input.txt')
   end
 
-  def run_app!(pattern:, text: ,opts: {})
+  def run_app!(pattern:, text:, options: {})
     File.write(@inp_path, text)
 
-    options = TEST_DEFAULTS.merge(opts)
+    all_options = Rex::DEFAULT_OPTIONS.merge(options)
 
     Rex::Application.new(
       pattern: pattern,
-      input:   Rex::Input.new([@inp_path], options),
-      options: options
+      input:   Rex::Input.new([@inp_path], all_options),
+      options: all_options
     ).run!
   end
 
   def test_concatenation_of_literals
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "test\ntest\n"
     assert_output(expected) {
       run_app!(
         pattern: 'test',
-        text: 'test abcd test abcd'
+        text: 'test abcd test abcd',
+        options: options
       )
     }
   end
 
   def test_one_match_mode
     # skip
-    options = { global: false }
+    options = {
+      global: false,
+      only_matches: true,
+      line_numbers: false
+    }
 
     expected = "test\n"
     assert_output(expected) {
       run_app!(
         pattern: 'test',
         text: 'test abcd test abcd',
-        opts: options
+        options: options
       )
     }
   end
 
   def test_alternation
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "man\npark\n"
     assert_output(expected) {
       run_app!(
         pattern: 'man|park',
-        text: 'a man is walking in the park.'
+        text: 'a man is walking in the park.',
+        options: options
       )
     }
   end
 
   def test_star
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = <<~HEREDOC
       aaabbb
 
@@ -82,90 +93,130 @@ class ApplicationTest < Minitest::Test
     assert_output(expected) {
       run_app!(
         pattern: '(a|b)*',
-        text: 'aaabbbcccab'
+        text: 'aaabbbcccab',
+        options: options
       )
     }
   end
 
   def test_option1
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "a\n"
     assert_output(expected) {
       run_app!(
         pattern: 'a?',
-        text: 'a'
+        text: 'a',
+        options: options
       )
     }
   end
 
   def test_option2
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "\n"
     assert_output(expected) {
       run_app!(
         pattern: 'a?',
-        text: 'b'
+        text: 'b',
+        options: options
       )
     }
   end
 
   def test_option3
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "colour\n"
     assert_output(expected) {
       run_app!(
         pattern: 'colou?r',
-        text: 'colour'
+        text: 'colour',
+        options: options
       )
     }
   end
 
   def test_option4
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "color\n"
     assert_output(expected) {
       run_app!(
         pattern: 'colou?r',
-        text: 'color'
+        text: 'color',
+        options: options
       )
     }
   end
 
   def test_dot
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = ["a\n", "a\n", "a\n", "b\n", "b\n", "b\n"].join
     assert_output(expected) {
       run_app!(
         pattern: '.',
-        text: 'aaabbb'
+        text: 'aaabbb',
+        options: options
       )
     }
   end
 
   def test_dot_star
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "aaabbb\n"
     assert_output(expected) {
       run_app!(
         pattern: '.*',
-        text: 'aaabbb'
+        text: 'aaabbb',
+        options: options
       )
     }
   end
 
   def test_slightly_more_complicated_regex
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "aaabbba\n"
     assert_output(expected) {
       run_app!(
         pattern: '(a|b)*(a|b)',
-        text: 'aaabbba'
+        text: 'aaabbba',
+        options: options
       )
     }
   end
 
   def test_multiline_input
     # skip
+    options = {
+      only_matches: true,
+      line_numbers: false
+    }
     expected = <<~HEREDOC
       aaa
       ccc
@@ -179,7 +230,8 @@ class ApplicationTest < Minitest::Test
     assert_output(expected) {
       run_app!(
         pattern: 'aaa|ccc',
-        text: text
+        text: text,
+        options: options
       )
     }
   end
@@ -187,8 +239,7 @@ class ApplicationTest < Minitest::Test
   def test_with_line_numbers_and_full_line_output
     # skip
     options = {
-      line_numbers: true,
-      only_matches: false
+      line_numbers: true
     }
 
     expected = <<~HEREDOC
@@ -205,18 +256,17 @@ class ApplicationTest < Minitest::Test
       run_app!(
         pattern: 'second',
         text: text,
-        opts: options
+        options: options
       )
     }
   end
 
   def test_with_full_line_output
     # skip
-
     options = {
-      only_matches: false
+      only_matches: false,
+      line_numbers: false
     }
-
     expected = "second line\n"
 
     text = <<~HEREDOC
@@ -229,14 +279,17 @@ class ApplicationTest < Minitest::Test
       run_app!(
         pattern: 'second',
         text: text,
-        opts: options
+        options: options
       )
     }
   end
 
   def test_with_line_numbers
     # skip
-    options = { line_numbers: true }
+    options = {
+      line_numbers: true,
+      only_matches: true
+    }
 
     expected = <<~HEREDOC
       1:1: test
@@ -247,14 +300,18 @@ class ApplicationTest < Minitest::Test
       run_app!(
         pattern: 'test',
         text: 'test abcd test abcd',
-        opts: options
+        options: options
       )
     }
   end
 
   def test_coloring_on
     # skip
-    options = { color: true }
+    options = {
+      color: true,
+      only_matches: true,
+      line_numbers: false
+    }
     expected = "\e[4m\e[31mtest\e[0m\e[0m\n"
     # ^ to verify this is what we need:
     # `$ echo -e "\e[4m\e[31mtest\e[0m\e[0m\n"`
@@ -264,7 +321,7 @@ class ApplicationTest < Minitest::Test
       run_app!(
         pattern: 'test',
         text: 'test',
-        opts: options
+        options: options
       )
     }
   end
@@ -273,7 +330,7 @@ class ApplicationTest < Minitest::Test
     # skip
     options = {
       color: true,
-      only_matches: false
+      line_numbers: false
     }
     expected = "somestuffand\e[4m\e[31mtest\e[0m\e[0mandmorestuff\n"
 
@@ -281,7 +338,7 @@ class ApplicationTest < Minitest::Test
       run_app!(
         pattern: 'test',
         text: 'somestuffandtestandmorestuff',
-        opts: options
+        options: options
       )
     }
   end

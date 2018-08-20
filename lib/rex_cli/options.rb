@@ -1,18 +1,7 @@
+require_relative './defaults.rb'
+
 module Rex
   module Options
-    DEFAULT_OPTIONS = {      # flag:
-      git:            false, # `-g`
-      recursive:      false, # `-r`
-      global:         true,  # `-s`
-      all_lines:      false, # `-a`
-      only_matches:   false, # `-o`
-      whitespace:     false, # `-w`
-      skip_dot_files: true,  # (no flag)
-      line_numbers:   nil,   # `-l ARG`
-      color:          nil,   # `-c ARG`
-      file_names:     nil    # `-f ARG`
-    }.freeze
-
     BANNER = <<~HEREDOC
       rex finds and prints lines matching a pattern.
 
@@ -47,7 +36,7 @@ module Rex
     def parse_options
       options = {}
       record_user_options(options)
-      Options::DEFAULT_OPTIONS.merge(options)
+      DEFAULT_OPTIONS.merge(options)
     end
 
     def record_user_options(options)
