@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative './options.rb'
+require_relative './cli_options.rb'
 require_relative './application.rb'
 require_relative './input.rb'
 

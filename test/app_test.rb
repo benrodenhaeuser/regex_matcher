@@ -15,12 +15,12 @@ class ApplicationTest < Minitest::Test
   def run_app!(pattern:, text:, options: {})
     File.write(@inp_path, text)
 
-    all_options = Rex::DEFAULT_OPTIONS.merge(options)
+    options = Rex::DEFAULT_OPTIONS.merge(options)
 
     Rex::Application.new(
       pattern: pattern,
-      input:   Rex::Input.new([@inp_path], all_options),
-      options: all_options
+      input:   Rex::Input.new([@inp_path], options),
+      options: options
     ).run!
   end
 
