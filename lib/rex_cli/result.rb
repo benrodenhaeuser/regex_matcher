@@ -56,10 +56,10 @@ module Rex
 
       row =
         case @opts[:line_numbers]
-        when true then @lineno
         when false then nil
+        when true then @lineno
         else
-          @path != Input::STDIN_PATH ? @lineno : nil
+          @path == Input::STDIN_PATH ? nil : @lineno
         end
 
       the_prefix = [filename, row, col].compact.join(':')
