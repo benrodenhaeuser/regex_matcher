@@ -1,5 +1,5 @@
 module Rex
-  module Options
+  module UserOptions
     BANNER = <<~HEREDOC
       rex finds and prints lines matching a pattern.
 

@@ -1,5 +1,5 @@
 require 'optparse'
-require_relative './cli_options.rb'
+require_relative './user_options.rb'
 require_relative './application.rb'
 require_relative './input.rb'
 require_relative './defaults.rb'
@@ -8,7 +8,7 @@ module Rex
   class CliError < RuntimeError; end
 
   class CLI
-    extend Options
+    extend UserOptions
 
     def self.run
       trap_sigint
