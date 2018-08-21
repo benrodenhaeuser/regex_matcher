@@ -14,22 +14,14 @@ module Rex
       trap_sigint
 
       ARGV << '--help' if ARGV.empty?
-
       options = DEFAULT_OPTIONS.merge(user_options)
-      arguments = {
+      raise CliError, "You have to supply a pattern" if ARGV.empty?
+
+      Application.new(
         pattern: ARGV.shift,
-        input:   Input.new(ARGV, options)
-      }
-
-      raise CliError, "You have to supply a pattern" unless arguments[:pattern]
-
-      app = Application.new(
-        pattern: arguments[:pattern],
-        input:   arguments[:input],
+        input:   Input.new(ARGV, options),
         options: options
-      )
-
-      app.run!
+      ).run!
     end
 
     def self.trap_sigint
