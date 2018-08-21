@@ -1,5 +1,3 @@
-require_relative './defaults.rb'
-
 module Rex
   module Options
     BANNER = <<~HEREDOC
@@ -32,10 +30,6 @@ module Rex
 
       Options:
     HEREDOC
-
-    def parse_options
-      DEFAULT_OPTIONS.merge(user_options)
-    end
 
     def user_options
       options = {}

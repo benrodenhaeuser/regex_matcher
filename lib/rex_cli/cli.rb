@@ -2,6 +2,7 @@ require 'optparse'
 require_relative './cli_options.rb'
 require_relative './application.rb'
 require_relative './input.rb'
+require_relative './defaults.rb'
 
 module Rex
   class CliError < RuntimeError; end
@@ -14,8 +15,11 @@ module Rex
 
       ARGV << '--help' if ARGV.empty?
 
-      options = parse_options
-      arguments = parse_arguments(options)
+      options = DEFAULT_OPTIONS.merge(user_options)
+      arguments = {
+        pattern: ARGV.shift,
+        input:   Input.new(ARGV, options)
+      }
 
       raise CliError, "You have to supply a pattern" unless arguments[:pattern]
 
@@ -28,13 +32,6 @@ module Rex
       app.run!
     end
 
-    def self.parse_arguments(options)
-      {
-        pattern: ARGV.shift,
-        input:   Input.new(ARGV, options)
-      }
-    end
-
     def self.trap_sigint
       trap "SIGINT" do
         puts; puts "Good-bye"
@@ -43,7 +40,5 @@ module Rex
     end
 
     private_class_method :trap_sigint
-    private_class_method :parse_arguments
-    private_class_method :parse_options
   end
 end
