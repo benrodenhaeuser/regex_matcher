@@ -2,7 +2,7 @@ require 'optparse'
 require_relative './user_options.rb'
 require_relative './application.rb'
 require_relative './input.rb'
-require_relative './defaults.rb'
+require_relative './default_options.rb'
 
 module Rex
   class CliError < RuntimeError; end

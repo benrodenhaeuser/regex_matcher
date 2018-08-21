@@ -2,7 +2,7 @@ require 'minitest/autorun'
 
 require_relative '../lib/rex_cli/application.rb'
 require_relative '../lib/rex_cli/input.rb'
-require_relative '../lib/rex_cli/defaults.rb'
+require_relative '../lib/rex_cli/default_options.rb'
 
 class ApplicationTest < Minitest::Test
   def setup
