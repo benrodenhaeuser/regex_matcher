@@ -34,11 +34,10 @@ module Rex
     HEREDOC
 
     def parse_options
-      user_options = parse_user_options
       DEFAULT_OPTIONS.merge(user_options)
     end
 
-    def parse_user_options
+    def user_options
       options = {}
 
       option_parser = OptionParser.new do |opts|
