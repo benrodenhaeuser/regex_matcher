@@ -17,6 +17,18 @@ module Rex
       moves.keys.reject { |key| key == SILENT }
     end
 
+    def link_to(char, *states)
+      moves[char] ||= Set.new
+      states.each { |state| moves[char].add(state) }
+    end
+
+    def link_from(char, *states)
+      states.each do |state|
+        state.moves[char] ||= Set.new
+        state.moves[char].add(self)
+      end
+    end
+
     def neighbors
       moves.each_value.with_object(Set.new) do |set_of_states, collection|
         collection.merge(set_of_states)

@@ -37,7 +37,7 @@ module Rex
       def char_automaton(char)
         initial_state = State.new
         terminal_state = State.new
-        initial_state.moves[char] = Set[terminal_state]
+        initial_state.link_to(char, terminal_state)
         new(
           initial:  initial_state,
           terminal: Set[terminal_state],
@@ -49,10 +49,10 @@ module Rex
       def dot_automaton
         initial_state = State.new
         terminal_state = State.new
-        ALPHABET.each { |char| initial_state.moves[char] = Set[terminal_state] }
+        ALPHABET.each { |char| initial_state.link_to(char, terminal_state) }
         new(
-          initial:    initial_state,
-          terminal:   Set[terminal_state],
+          initial:  initial_state,
+          terminal: Set[terminal_state],
           alphabet: Set[*ALPHABET],
           states:   Set[initial_state, terminal_state]
         )
@@ -61,10 +61,9 @@ module Rex
 
     def alternate(other)
       new_initial_state = State.new
+      new_initial_state.link_to(SILENT, initial, other.initial)
       new_terminal_state = State.new
-      new_initial_state.moves[SILENT] = Set[initial, other.initial]
-      terminal.element.moves[SILENT] = Set[new_terminal_state]
-      other.terminal.element.moves[SILENT] = Set[new_terminal_state]
+      new_terminal_state.link_from(SILENT, terminal.elem, other.terminal.elem)
       self.initial = new_initial_state
       self.terminal = Set[new_terminal_state]
       alphabet.merge(other.alphabet)
@@ -73,7 +72,7 @@ module Rex
     end
 
     def concat(other)
-      terminal.element.moves[SILENT] = Set[other.initial]
+      terminal.elem.link_to(SILENT, other.initial)
       self.terminal = other.terminal
       alphabet.merge(other.alphabet)
       states.merge(other.states)
@@ -83,8 +82,8 @@ module Rex
     def iterate
       new_initial_state = State.new
       new_terminal_state = State.new
-      terminal.element.moves[SILENT] = Set[initial, new_terminal_state]
-      new_initial_state.moves[SILENT] = Set[initial, new_terminal_state]
+      terminal.elem.link_to(SILENT, initial, new_terminal_state)
+      new_initial_state.link_to(SILENT, initial, new_terminal_state)
       self.initial = new_initial_state
       self.terminal = Set[new_terminal_state]
       states.merge([new_initial_state, new_terminal_state])

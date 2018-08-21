@@ -7,7 +7,7 @@ class Set
     size == 1
   end
 
-  def element
+  def elem
     raise SetError, 'Not a singleton!' unless singleton?
     to_a.first
   end
