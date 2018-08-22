@@ -20,7 +20,7 @@ module Rex
           - use `rex --recursive pattern` to recursively search files in current
             working directory
           - use `rex --git pattern` to recursively search files in current
-            working directory that are under git source control
+            working directory that are not git-ignored
           - use `rex [options] pattern` (omitting the file argument) to enter
             'interactive' mode, where rex reads from stdin
           - as usual:
@@ -63,6 +63,7 @@ module Rex
 
         opts.on("--git", "-g",
                 "*g*it search") do
+          options[:recursive] = true
           options[:git] = true
 
           git_dir = "git rev-parse --is-inside-work-tree 2>/dev/null"

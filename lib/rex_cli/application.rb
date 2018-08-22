@@ -9,8 +9,7 @@ module Rex
 
       @engine = Engine.new(@pattern, @opts)
       file_paths.replace(['.']) if @opts[:recursive]
-      file_paths.replace(git_files) if @opts[:git]
-      @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive] || @opts[:git]
+      @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive]
     end
 
     def run!
@@ -27,10 +26,6 @@ module Rex
 
     def file_paths
       @input.paths
-    end
-
-    def git_files
-      `git ls-files`.lines.map(&:chomp)
     end
   end
 end
