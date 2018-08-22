@@ -6,22 +6,23 @@ module Rex
       Usage: rex [options] pattern [file ...]
 
       Defaults:
-          - print line numbers when reading input from a file ('smart')
-          - show file names when searching multiple files ('smart')
-          - color matches when printing to terminal ('smart')
+          - print line numbers if (and only if) reading input from a file
+          - show file names if (and only if) searching multiple files
+          - colorize matches if (and only if) printing to terminal
           - find multiple matches per line
           - print lines with matches only
           - print lines rather than only matches
           - strip leading whitespace from lines printed
+          - non-recursively search given files
 
       Notes:
-          - use `--filename`, `--line-number` and `--color` flags to override
-            'smart' defaults and enforce uniform behaviour
+          - use `--filename on/off`, `--line-number on/off` and `--color
+            on/off` options to override the 'smart' defaults described above
           - use `rex --recursive pattern` to recursively search files in current
             working directory
           - use `rex --git pattern` to recursively search files in current
-            working directory that are not git-ignored
-          - as usual:
+            working directory while honouring their 'git ignore' status
+          - works like standard UNIX tools:
             - `rex [options] pattern` will have rex read from stdin
             - `cmd | rex ...` will pipe cmd output to rex input
             - `rex ... | cmd` will pipe rex output to cmd input
