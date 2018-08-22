@@ -12,11 +12,11 @@ module Rex
       puts line_report if line_report
     end
 
-    def report(input, opts)
+    def report(file, opts)
       return nil if @matches.empty? && !opts[:all_lines]
 
-      @lineno = input.current_file.lineno
-      @path   = input.current_file.path
+      @lineno = file.lineno
+      @path   = file.path
       @opts   = opts
 
       @opts[:only_matches] ? only_matches_report : text_with_matches_report

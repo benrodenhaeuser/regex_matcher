@@ -14,7 +14,7 @@ module Rex
 
     def run
       @input.each do |line|
-        @engine.search(line.chomp).report!(@input, @opts)
+        @engine.search(line.chomp).report!(@input.current_file, @opts)
       end
     end
 
