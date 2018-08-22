@@ -9,7 +9,7 @@ module Rex
         opts.banner = BANNER
 
         opts.on("--line-number=STATUS", "-l STATUS",
-                "Print/hide *l*ine number (STATUS: on/off)") do |status|
+                "Print/hide *l*ine number (on/off)") do |status|
           case status
           when 'on'  then options[:line_numbers] = true
           when 'off' then options[:line_numbers] = false
@@ -17,7 +17,7 @@ module Rex
         end
 
         opts.on("--file-name=STATUS", "-f STATUS",
-                "print/hide *f*ile name (status: on/off)") do |status|
+                "print/hide *f*ile name (on/off)") do |status|
           case status
           when 'on'  then options[:file_names] = true
           when 'off' then options[:file_names] = false
@@ -25,7 +25,7 @@ module Rex
         end
 
         opts.on("--color=STATUS", "-c STATUS",
-                "show/hide match *c*olor (status: on/off)") do |status|
+                "show/hide match *c*olor (on/off)") do |status|
           case status
           when 'on'  then options[:color] = true
           when 'off' then options[:color] = false
