@@ -21,9 +21,8 @@ module Rex
             working directory
           - use `rex --git pattern` to recursively search files in current
             working directory that are not git-ignored
-          - use `rex [options] pattern` (omitting the file argument) to enter
-            'interactive' mode, where rex reads from stdin
           - as usual:
+            - `rex [options] pattern` will have rex read from stdin
             - `cmd | rex ...` will pipe cmd output to rex input
             - `rex ... | cmd` will pipe rex output to cmd input
             - `rex ... > file` will write rex output to file
