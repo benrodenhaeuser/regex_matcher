@@ -19,22 +19,25 @@ module Rex
       return to_enum(:each) unless block_given?
 
       Find.find(*paths) do |path|
-        first_letter = File.basename(File.expand_path(path))[0]
-
-        if @opts[:skip_dot_files] && first_letter == '.'
-          Find.prune
-        end
-
-        if @opts[:git] && `git check-ignore #{path}/` != ''
-          Find.prune
-        end
-
+        Find.prune if @opts[:skip_dot_files] && dotfile?(path)
+        Find.prune if @opts[:git] && gitignored?(path)
+        
         next if FileTest.directory?(path)
 
         @current_file = File.open(path, 'r')
         @current_file.each { |line| yield line }
         @current_file.close
       end
+    end
+
+    private
+
+    def dotfile?(path)
+      File.basename(File.expand_path(path))[0] == '.'
+    end
+
+    def gitignored?(path)
+      `git check-ignore #{path}/` != ''
     end
   end
 end

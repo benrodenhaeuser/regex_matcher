@@ -60,8 +60,7 @@ module Rex
           end
         end
 
-        opts.on("--git", "-g",
-                "*g*it search") do
+        opts.on("--git", "-g", "*g*it search") do
           options[:recursive] = true
           options[:git] = true
 
@@ -76,28 +75,25 @@ module Rex
           options[:recursive] = true
         end
 
-        opts.on("--single-match", "-s",
-                "at most *s*ingle match per line") do
+        opts.on("--single-match", "-s", "at most *s*ingle match per line") do
           options[:global] = false
         end
 
-        opts.on("--all-lines", "-a",
-                "output *a*ll input lines") do
+        opts.on("--all-lines", "-a", "output *a*ll input lines") do
           options[:all_lines] = true
         end
 
-        opts.on("--only-match", "-o",
+        opts.on("--only-match",
+                "-o",
                 "print *o*nly matches (not full lines)") do
           options[:only_matches] = true
         end
 
-        opts.on("--whitespace", "-w",
-                "leave leading *w*hitespace intact") do
+        opts.on("--whitespace", "-w", "leave leading *w*hitespace intact") do
           options[:whitespace] = true
         end
 
-        opts.on_tail("--help",
-                     "Help (this message)") do
+        opts.on_tail("--help", "Help (this message)") do
           puts opts
           exit
         end
