@@ -12,7 +12,7 @@ module Rex
       @opts[:file_names] ||= no_of_paths > 1 || @opts[:recursive]
     end
 
-    def run!
+    def run
       @input.each do |line|
         @engine.search(line.chomp).report!(@input, @opts)
       end

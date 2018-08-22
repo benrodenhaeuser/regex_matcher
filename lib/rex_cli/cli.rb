@@ -21,7 +21,7 @@ module Rex
         pattern: ARGV.shift,
         input:   Input.new(ARGV, options),
         options: options
-      ).run!
+      ).run
     end
 
     def self.trap_sigint

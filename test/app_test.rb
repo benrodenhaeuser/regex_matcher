@@ -21,7 +21,7 @@ class ApplicationTest < Minitest::Test
       pattern: pattern,
       input:   Rex::Input.new([@inp_path], options),
       options: options
-    ).run!
+    ).run
   end
 
   def test_concatenation_of_literals
