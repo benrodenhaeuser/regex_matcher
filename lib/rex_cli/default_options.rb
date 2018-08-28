@@ -6,7 +6,7 @@ module Rex
     all_lines:      false,        # `-a`
     only_matches:   false,        # `-o`
     whitespace:     false,        # `-w`
-    skip_dot_files: true,         # (no flag)
+    skip_dot_files: true,         # (no flag, not configurable)
     line_numbers:   nil,          # `-l ARG`
     color:          nil,          # `-c ARG`
     file_names:     nil           # `-f ARG`
