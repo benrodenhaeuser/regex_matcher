@@ -3,7 +3,8 @@ require 'bundler/gem_tasks'
 
 # - runs all test files in `test`
 # - logs minitest output to `test/reports`
-# - prints per file summary (failures/errors/skips) at the end
+# - prints per file summary (failures/errors/skips)
+
 desc 'Run all tests'
 task :test do
   run_tests
